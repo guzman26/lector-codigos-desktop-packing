@@ -1,0 +1,22 @@
+.widget {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.latest {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.history {
+  list-style: none;
+  margin: 0.5rem 0 0 0;
+  padding: 0;
+} 

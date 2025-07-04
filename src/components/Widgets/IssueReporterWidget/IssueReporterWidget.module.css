@@ -1,0 +1,33 @@
+.widget {
+  background: #1e1e1e;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.success {
+  color: #6bff95;
+} 

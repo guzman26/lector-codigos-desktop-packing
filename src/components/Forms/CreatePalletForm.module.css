@@ -1,0 +1,33 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #1e1e1e;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+}
+
+.button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.success {
+  color: #6bff95;
+} 
