@@ -1,0 +1,170 @@
+/* Create Pallet Form Component Styles */
+.form {
+  background-color: var(--color-charcoal-800);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-charcoal-700);
+  overflow: hidden;
+  width: 100%;
+  max-width: 32rem;
+}
+
+/* Form Header */
+.form__header {
+  background-color: var(--color-charcoal-700);
+  border-bottom: 1px solid var(--color-charcoal-600);
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  letter-spacing: 0.025em;
+  margin: 0;
+}
+
+.form__badge {
+  background-color: var(--color-primary);
+  color: var(--color-charcoal-900);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Form Body */
+.form__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+}
+
+/* Form Fields */
+.form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-gray-300);
+}
+
+.form__select {
+  background-color: var(--color-charcoal-700);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--color-white);
+  border: 1px solid var(--color-charcoal-600);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a3a3a3' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  padding-right: var(--spacing-2xl);
+}
+
+.form__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(255 210 63 / 0.1);
+}
+
+.form__select:hover {
+  border-color: var(--color-charcoal-500);
+}
+
+/* Feedback Messages */
+.form__message {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-base);
+}
+
+.form__message--error {
+  background-color: rgb(248 113 113 / 0.1);
+  border: 1px solid rgb(248 113 113 / 0.4);
+  color: var(--color-error);
+}
+
+.form__message--success {
+  background-color: rgb(74 222 128 / 0.1);
+  border: 1px solid rgb(74 222 128 / 0.4);
+  color: var(--color-success);
+}
+
+.form__message-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Submit Button */
+.form__submit {
+  background-color: var(--color-primary);
+  color: var(--color-charcoal-900);
+  font-weight: var(--font-weight-bold);
+  padding: 1.25rem var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  transition: all var(--transition-base);
+  margin-top: var(--spacing-sm);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.form__submit:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.form__submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.form__submit:disabled {
+  opacity: 0.5;
+  background-color: var(--color-charcoal-600);
+  color: var(--color-charcoal-400);
+  cursor: not-allowed;
+}
+
+.form__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Loading Spinner */
+.form__spinner {
+  animation: spin 1s linear infinite;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

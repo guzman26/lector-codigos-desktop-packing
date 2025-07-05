@@ -1,0 +1,146 @@
+/* Command Input Component Styles */
+.terminal {
+  background-color: var(--color-charcoal-800);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-charcoal-700);
+  overflow: hidden;
+}
+
+/* Terminal Header */
+.terminal__header {
+  background-color: var(--color-charcoal-700);
+  border-bottom: 1px solid var(--color-charcoal-600);
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  align-items: center;
+}
+
+.terminal__buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-right: var(--spacing-md);
+}
+
+.terminal__button {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--radius-full);
+}
+
+.terminal__button--close {
+  background-color: var(--color-error);
+}
+
+.terminal__button--minimize {
+  background-color: var(--color-warning);
+}
+
+.terminal__button--maximize {
+  background-color: var(--color-success);
+}
+
+.terminal__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-300);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Terminal Body */
+.terminal__body {
+  padding: var(--spacing-md);
+  background-color: var(--color-charcoal-900);
+}
+
+/* Result Display */
+.terminal__result {
+  margin-bottom: var(--spacing-md);
+  background-color: var(--color-charcoal-800);
+  color: var(--color-success);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-mono);
+  white-space: pre-wrap;
+  border: 1px solid var(--color-charcoal-700);
+  font-size: var(--font-size-base);
+  max-height: 12rem;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-charcoal-600) transparent;
+}
+
+.terminal__result::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal__result::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terminal__result::-webkit-scrollbar-thumb {
+  background-color: var(--color-charcoal-600);
+  border-radius: var(--radius-sm);
+}
+
+/* Command Input Form */
+.terminal__form {
+  display: flex;
+  align-items: center;
+}
+
+.terminal__prompt {
+  color: var(--color-primary);
+  font-family: var(--font-family-mono);
+  margin-right: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.terminal__input {
+  flex: 1;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  background-color: transparent;
+  color: var(--color-white);
+  font-family: var(--font-family-mono);
+  border: none;
+  outline: none;
+}
+
+.terminal__input::placeholder {
+  color: var(--color-gray-500);
+}
+
+.terminal__input:focus {
+  outline: none;
+}
+
+/* Run Button */
+.terminal__submit {
+  background-color: var(--color-primary);
+  color: var(--color-charcoal-900);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  margin-left: var(--spacing-sm);
+  transition: all var(--transition-base);
+  border: none;
+  cursor: pointer;
+}
+
+.terminal__submit:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.terminal__submit:active {
+  transform: translateY(0);
+}
+
+.terminal__submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
