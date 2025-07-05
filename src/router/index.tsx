@@ -1,11 +1,15 @@
 import { lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
 
-const Home = lazy(() => import('../pages/Home'));
+const MainTerminal = lazy(() => import('../views/MainTerminal/MainTerminal'));
+const CreatePallet = lazy(() => import('../views/CreatePallet/CreatePallet'))
 
-export const router = createBrowserRouter([
+export const routes = [
   {
     path: '/',
-    element: <Home />,
+    element: <MainTerminal />,
   },
-]);
+  {
+    path: '/create-pallet',
+    element: <CreatePallet />,
+  },
+];

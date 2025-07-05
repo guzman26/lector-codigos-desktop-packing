@@ -3,7 +3,6 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import CommandInput from '../../components/CommandInput/CommandInput';
 import { Link } from 'react-router-dom';
 import { useCommandHandler } from '../../hooks/useCommandHandler';
-import styles from './MainTerminal.module.css';
 
 /**
  * MainTerminal is the single entry point for the "terminal" UI. It composes
@@ -19,10 +18,10 @@ const MainTerminal: React.FC = () => {
   const { handleCommand, lastCommandResult } = useCommandHandler();
 
   return (
-    <main className={styles.container}>
+    <main className="flex flex-col h-screen">
       <Dashboard />
       <CommandInput onSubmit={handleCommand} lastResult={lastCommandResult} />
-      <Link to="/create-pallet" className={styles.createPalletBtn}>
+      <Link to="/create-pallet" className="form-button">
         Crear Pallet
       </Link>
     </main>

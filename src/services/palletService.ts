@@ -1,28 +1,16 @@
 import { fetchJson } from './fetchJson';
+import { API_BASE } from './index';
+import type { Pallet, UnassignedBox } from '../types';
 
 /**
  * Domain models – keep them minimal; extend as backend evolves.
  */
-export interface Pallet {
-  id: string;
-  code: string;
-  createdAt: string;
-  // ...other pallet attributes
-}
-
-export interface UnassignedBox {
-  id: string;
-  code: string;
-  // ...other box attributes
-}
-
-const API_BASE = '/api';
 
 export const fetchActivePallets = () =>
-  fetchJson<Pallet[]>(`${API_BASE}/pallets/active`);
+  fetchJson<Pallet[]>(`${API_BASE}/getActivePallets`);
 
 export const fetchAllPallets = () =>
-  fetchJson<Pallet[]>(`${API_BASE}/pallets`);
+  fetchJson<Pallet[]>(`${API_BASE}/getPallets`);
 
 export const getUnassignedBoxes = () =>
   fetchJson<UnassignedBox[]>(`${API_BASE}/boxes/unassigned`);

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './CodeInputWidget.module.css';
+import WidgetCard from '../WidgetCard';
 
 export interface CodeInputWidgetProps {
   data: {
@@ -16,15 +16,14 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data }) => {
   const { latestCode, history } = data;
 
   return (
-    <div className={styles.widget}>
-      <h2 className={styles.title}>Code Input</h2>
-      <p className={styles.latest}>{latestCode ?? '—'}</p>
-      <ul className={styles.history}>
+    <WidgetCard title="Code Input">
+      <p className="text-2xl font-bold">{latestCode ?? '—'}</p>
+      <ul className="list-none mt-2 space-y-1">
         {history.map((code, idx) => (
           <li key={`${code}-${idx}`}>{code}</li>
         ))}
       </ul>
-    </div>
+    </WidgetCard>
   );
 };
 

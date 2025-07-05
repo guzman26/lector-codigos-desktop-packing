@@ -1,5 +1,5 @@
 import { fetchJson } from './fetchJson';
-
+import { API_BASE } from './index';
 export interface IssueResponse {
   success: boolean;
   message: string;
@@ -7,10 +7,9 @@ export interface IssueResponse {
   ticketId?: string;
 }
 
-const API_BASE = '/api';
 
 export const postIssue = (issue: string) =>
-  fetchJson<IssueResponse>(`${API_BASE}/issues`, {
+  fetchJson<IssueResponse>(`${API_BASE}/postIssue`, {
     method: 'POST',
-    body: JSON.stringify({ issue }),
+    body: JSON.stringify({ descripcion: issue }),
   }); 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getUnassignedBoxesInPacking } from '../services/boxService';
-import type { UnassignedBox } from '../services/boxService';
+import type { UnassignedBox } from '../types';
+import { extractDataFromResponse } from '../utils/extractDataFromResponse';
 
 export const useUnassignedBoxesInPacking = () => {
   const [data, setData] = useState<UnassignedBox[]>([]);
@@ -10,7 +11,9 @@ export const useUnassignedBoxesInPacking = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setData(await getUnassignedBoxesInPacking());
+      const data = await getUnassignedBoxesInPacking();
+      const extractedData = extractDataFromResponse(data);
+      setData(extractedData);
       setError(null);
     } catch (err) {
       setError(err as Error);

@@ -1,12 +1,14 @@
 import React from 'react';
-import styles from './SystemInfoWidget.module.css';
+import WidgetCard from '../WidgetCard';
 
 interface SystemInfoWidgetProps {
   data: any;
 }
 
 const SystemInfoWidget: React.FC<SystemInfoWidgetProps> = ({ data }) => (
-  <div className={styles.widget}>System Info: {JSON.stringify(data)}</div>
+  <WidgetCard title="System Info">
+    <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(data, null, 2)}</pre>
+  </WidgetCard>
 );
 
 export default SystemInfoWidget; 

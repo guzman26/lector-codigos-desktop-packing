@@ -1,4 +1,6 @@
-import { fetchJson } from './fetchJson';
+import { fetchJson } from './fetchJson';  
+import { API_BASE } from './index';
+import type { UnassignedBox } from '../types';
 
 export interface Box {
   id: string;
@@ -12,14 +14,11 @@ export interface BoxDetails extends Box {
   [key: string]: unknown;
 }
 
-export type UnassignedBox = Box;
-
-const API_BASE = '/api/boxes';
 
 export const createBox = (boxData: unknown) =>
-  fetchJson<BoxDetails>(API_BASE, {
+  fetchJson<BoxDetails>(`${API_BASE}/procesar-escaneo`, {
     method: 'POST',
-    body: JSON.stringify(boxData),
+    body: JSON.stringify({codigo: boxData, ubicacion: 'PACKING'}),
   });
 
 export const getBoxByCode = (code: string) =>
@@ -31,4 +30,5 @@ export const deleteBox = (boxCode: string) =>
   });
 
 export const getUnassignedBoxesInPacking = () =>
-  fetchJson<UnassignedBox[]>(`${API_BASE}/unassigned?section=packing`); 
+  fetchJson<UnassignedBox[]>(`${API_BASE}/getUnassignedBoxesInPacking
+`); 

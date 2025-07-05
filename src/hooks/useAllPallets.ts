@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchAllPallets } from '../services/palletService';
-import type { Pallet } from '../services/palletService';
+import type { Pallet } from '../types';
+import { extractDataFromResponse } from '../utils/extractDataFromResponse';
 
 export const useAllPallets = () => {
   const [data, setData] = useState<Pallet[]>([]);
@@ -10,7 +11,9 @@ export const useAllPallets = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setData(await fetchAllPallets());
+      const data = await fetchAllPallets();
+      const extractedData = extractDataFromResponse(data);
+      setData(extractedData);
       setError(null);
     } catch (err) {
       setError(err as Error);

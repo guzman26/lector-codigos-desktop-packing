@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchActivePallets } from '../services/palletService';
-import type { Pallet } from '../services/palletService';
+import type { Pallet } from '../types';
+import { extractDataFromResponse } from '../utils/extractDataFromResponse';
 
 export const useActivePallets = () => {
   const [data, setData] = useState<Pallet[]>([]);
@@ -10,7 +11,9 @@ export const useActivePallets = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setData(await fetchActivePallets());
+      const data = await fetchActivePallets();
+      const extractedData = extractDataFromResponse(data);
+      setData(extractedData);
       setError(null);
     } catch (err) {
       setError(err as Error);
@@ -18,13 +21,11 @@ export const useActivePallets = () => {
       setLoading(false);
     }
   }, []);
-
   useEffect(() => {
     load();
-    // Optionally poll every N seconds
-    const id = setInterval(load, 10_000);
-    return () => clearInterval(id);
   }, [load]);
+
+  
 
   return { data, loading, error, refresh: load };
 }; 
