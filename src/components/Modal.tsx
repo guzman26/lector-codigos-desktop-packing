@@ -9,13 +9,14 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children: ReactNode;
+  showTrafficLights?: boolean;
 }
 
 /**
  * Generic modal overlay. Renders its children in a centered card with backdrop.
  * Uses a React portal attached to document.body.
  */
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, showTrafficLights = true }) => {
   // Prevent background scroll when modal is open
   useEffect(() => {
     if (!isOpen) return;
@@ -58,11 +59,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   };
 
   const headerStyles: React.CSSProperties = {
-    padding: theme.spacing.xl,
+    padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
     borderBottom: `1px solid ${theme.colors.border.light}`,
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: theme.spacing.lg,
   };
 
   const titleStyles: React.CSSProperties = {
@@ -72,18 +73,13 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     margin: 0,
   };
 
-  const closeButtonStyles: React.CSSProperties = {
-    width: '32px',
-    height: '32px',
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.background.tertiary,
-    border: 'none',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: `all ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
-  };
+  const trafficButtonStyles = (color: string): React.CSSProperties => ({
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    backgroundColor: color,
+    cursor: color === '#FF5F56' ? 'pointer' : 'default',
+  });
 
   const contentStyles: React.CSSProperties = {
     padding: theme.spacing.xl,
@@ -114,26 +110,22 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-              {title && (
+              {(title || showTrafficLights) && (
                 <div style={headerStyles}>
-                  <h3 style={titleStyles}>{title}</h3>
-                  <motion.button
-                    style={closeButtonStyles}
-                    onClick={onClose}
-                    aria-label="Close"
-                    whileHover={{ 
-                      backgroundColor: theme.colors.background.primary,
-                      scale: 1.05,
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <X size={18} color={theme.colors.text.secondary} />
-                  </motion.button>
+                  {showTrafficLights && (
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <span
+                        style={trafficButtonStyles('#FF5F56')}
+                        onClick={onClose}
+                      />
+                      <span style={trafficButtonStyles('#FFBD2E')} />
+                      <span style={trafficButtonStyles('#27C93F')} />
+                    </div>
+                  )}
+                  {title && <h3 style={titleStyles}>{title}</h3>}
                 </div>
               )}
-              <div style={contentStyles}>
-                {children}
-              </div>
+              <div style={contentStyles}>{children}</div>
             </motion.div>
           </div>
         </>
