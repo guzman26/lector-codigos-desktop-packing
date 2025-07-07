@@ -8,3 +8,5 @@ export { ToggleSwitch } from './ToggleSwitch';
 export { ProgressBar } from './ProgressBar';
 export { Tooltip } from './Tooltip';
 export { Tabs } from './Tabs';
+export { Alert } from './Alert';
+export { MacWindow } from './MacWindow';

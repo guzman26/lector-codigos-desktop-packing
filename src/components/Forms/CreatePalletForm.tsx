@@ -7,8 +7,7 @@ import {
 } from '../../utils/options';
 import { generatePalletCode } from '../../utils/codeUtils';
 import { useCreatePallet } from '../../hooks/useCreatePallet';
-import { Card, Select, Button, ProgressBar } from '../ui';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { Card, Select, Button, ProgressBar, Alert } from '../ui';
 import { theme } from '../../styles/theme';
 
 const CreatePalletForm: React.FC = () => {
@@ -52,18 +51,6 @@ const CreatePalletForm: React.FC = () => {
     gap: theme.spacing.xl,
     marginBottom: theme.spacing['2xl'],
   };
-
-  const messageStyles = (success: boolean): React.CSSProperties => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    padding: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: success ? theme.colors.accent.green + '20' : theme.colors.accent.red + '20',
-    color: success ? theme.colors.accent.green : theme.colors.accent.red,
-    fontFamily: theme.typography.fontFamily.primary,
-    fontSize: theme.typography.fontSize.sm,
-  });
 
   return (
     <Card variant="elevated" padding="large">
@@ -109,17 +96,15 @@ const CreatePalletForm: React.FC = () => {
         </div>
 
         {error && (
-          <div style={messageStyles(false)}>
-            <AlertCircle size={18} />
-            <span>{error.message}</span>
-          </div>
+          <Alert variant="error" dismissible onClose={() => { /* optional */ }}>
+            {error.message}
+          </Alert>
         )}
 
         {data && (
-          <div style={messageStyles(true)}>
-            <CheckCircle size={18} />
-            <span>Pallet #{data.code} creado exitosamente</span>
-          </div>
+          <Alert variant="success">
+            Pallet #{data.code} creado exitosamente
+          </Alert>
         )}
 
         {loading && (
