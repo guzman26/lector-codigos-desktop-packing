@@ -3,6 +3,129 @@
 
 /* Additional app-specific styles can go here */
 
+/* macOS-inspired global styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #1D1D1F;
+  background-color: #F5F5F7;
+  overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  color: #1D1D1F;
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-size: 28px;
+  letter-spacing: -0.01em;
+}
+
+h4 {
+  font-size: 24px;
+}
+
+h5 {
+  font-size: 20px;
+}
+
+h6 {
+  font-size: 17px;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: #0071E3;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+a:hover {
+  color: #0077ED;
+  text-decoration: underline;
+}
+
+/* Selection */
+::selection {
+  background-color: #0071E3;
+  color: #FFFFFF;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: background-color 150ms ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Focus styles */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(0, 113, 227, 0.4);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.text-secondary {
+  color: #86868B;
+}
+
+.text-tertiary {
+  color: #515154;
+}
+
 /* Remove default margins from root element */
 #root {
   display: flex;

@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './CommandInput.module.css';
+import { Card, Button } from '../ui';
+import { Terminal, Play } from 'lucide-react';
+import { theme } from '../../styles/theme';
+import { motion } from 'framer-motion';
 
 interface CommandInputProps {
   onSubmit: (command: string) => void;
@@ -52,44 +55,128 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     }
   };
 
+  const terminalHeaderStyles: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    padding: theme.spacing.md,
+    borderBottom: `1px solid ${theme.colors.border.light}`,
+    backgroundColor: theme.colors.background.tertiary,
+    borderTopLeftRadius: theme.borderRadius.xl,
+    borderTopRightRadius: theme.borderRadius.xl,
+  };
+
+  const terminalButtonStyles: React.CSSProperties = {
+    width: '12px',
+    height: '12px',
+    borderRadius: '50%',
+    display: 'inline-block',
+  };
+
+  const terminalBodyStyles: React.CSSProperties = {
+    backgroundColor: '#1E1E1E',
+    color: '#D4D4D4',
+    fontFamily: theme.typography.fontFamily.mono,
+    fontSize: theme.typography.fontSize.sm,
+    padding: theme.spacing.lg,
+    minHeight: '200px',
+    maxHeight: '400px',
+    overflowY: 'auto',
+    borderBottomLeftRadius: theme.borderRadius.xl,
+    borderBottomRightRadius: theme.borderRadius.xl,
+  };
+
+  const formStyles: React.CSSProperties = {
+    display: 'flex',
+    gap: theme.spacing.sm,
+    alignItems: 'center',
+    marginTop: theme.spacing.md,
+  };
+
+  const inputStyles: React.CSSProperties = {
+    flex: 1,
+    backgroundColor: 'transparent',
+    border: 'none',
+    outline: 'none',
+    color: '#D4D4D4',
+    fontFamily: theme.typography.fontFamily.mono,
+    fontSize: theme.typography.fontSize.sm,
+    padding: `${theme.spacing.xs} 0`,
+  };
+
+  const promptStyles: React.CSSProperties = {
+    color: '#4EC9B0',
+    fontFamily: theme.typography.fontFamily.mono,
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.bold,
+  };
+
+  const resultStyles: React.CSSProperties = {
+    fontFamily: theme.typography.fontFamily.mono,
+    fontSize: theme.typography.fontSize.sm,
+    color: '#D4D4D4',
+    whiteSpace: 'pre-wrap',
+    marginBottom: theme.spacing.md,
+    padding: theme.spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: theme.borderRadius.sm,
+  };
+
   return (
-    <div className={styles.terminal}>
-      <div className={styles.terminal__header}>
-        <div className={styles.terminal__buttons}>
-          <div className={`${styles.terminal__button} ${styles['terminal__button--close']}`}></div>
-          <div className={`${styles.terminal__button} ${styles['terminal__button--minimize']}`}></div>
-          <div className={`${styles.terminal__button} ${styles['terminal__button--maximize']}`}></div>
+    <div style={{ marginTop: theme.spacing['2xl'] }}>
+      <div style={terminalHeaderStyles}>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <span style={{ ...terminalButtonStyles, backgroundColor: '#FF5F56' }}></span>
+          <span style={{ ...terminalButtonStyles, backgroundColor: '#FFBD2E' }}></span>
+          <span style={{ ...terminalButtonStyles, backgroundColor: '#27C93F' }}></span>
         </div>
-        <h3 className={styles.terminal__title}>Terminal</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.xs, marginLeft: 'auto' }}>
+          <Terminal size={16} color={theme.colors.text.secondary} />
+          <span style={{ 
+            fontSize: theme.typography.fontSize.sm, 
+            color: theme.colors.text.secondary,
+            fontWeight: theme.typography.fontWeight.medium,
+          }}>
+            Terminal de Comandos
+          </span>
+        </div>
       </div>
       
-      <div className={styles.terminal__body}>
+      <div style={terminalBodyStyles}>
         {/* Command result display */}
         {lastResult && (
-          <pre className={styles.terminal__result}>
+          <motion.pre 
+            style={resultStyles}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
             {lastResult}
-          </pre>
+          </motion.pre>
         )}
         
         {/* Command input with terminal styling */}
-        <form className={styles.terminal__form} onSubmit={handleSubmit}>
-          <span className={styles.terminal__prompt}>$</span>
+        <form style={formStyles} onSubmit={handleSubmit}>
+          <span style={promptStyles}>$</span>
           <input
             ref={inputRef}
-            className={styles.terminal__input}
+            style={inputStyles}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Enter command..."
+            placeholder="Ingrese comando..."
             spellCheck="false"
             autoComplete="off"
             aria-label="Command input"
           />
-          <button 
-            type="submit" 
-            className={styles.terminal__submit}>
-            Run
-          </button>
+          <Button 
+            type="submit"
+            size="small"
+            variant="ghost"
+            icon={<Play size={16} />}
+          >
+            Ejecutar
+          </Button>
         </form>
       </div>
     </div>

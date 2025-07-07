@@ -1,5 +1,6 @@
 import React from 'react';
-import styles from './Dashboard.module.css';
+import { Card } from '../ui';
+import { theme } from '../../styles/theme';
 import CodeInputWidget from '../Widgets/CodeInputWidget/CodeInputWidget';
 import ActivePalletsWidget from '../Widgets/ActivePalletsWidget/ActivePalletsWidget';
 import AllPalletsWidget from '../Widgets/AllPalletsWidget/AllPalletsWidget';
@@ -15,45 +16,70 @@ import CreatePalletWidget from '../Widgets/CreatePalletWidget/CreatePalletWidget
  * Redesigned for industrial touchscreen use with high-contrast, 
  * minimalistic interface suitable for factory environments.
  */
-const Dashboard: React.FC = () => (
-  <section className={styles.dashboard}>
-    <div className={styles.dashboard__grid}>
-      {/* Primary Operations Row - Most Used Features */}
-      <div className={`${styles.dashboard__widget} ${styles['dashboard__widget--primary']}`}>
-        <CodeInputWidget data={{ latestCode: '', history: [] }} />
+const Dashboard: React.FC = () => {
+  const gridStyles: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gap: theme.spacing.xl,
+    width: '100%',
+  };
+
+  const primaryWidgetStyles: React.CSSProperties = {
+    gridColumn: 'span 2',
+  };
+
+  const sectionTitleStyles: React.CSSProperties = {
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: theme.typography.fontWeight.semibold,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.lg,
+  };
+
+  return (
+    <section>
+      {/* Primary Operations Section */}
+      <h2 style={sectionTitleStyles}>Operaciones Principales</h2>
+      <div style={{ ...gridStyles, marginBottom: theme.spacing['3xl'] }}>
+        <Card variant="elevated" style={primaryWidgetStyles}>
+          <CodeInputWidget data={{ latestCode: '', history: [] }} />
+        </Card>
+        <Card variant="elevated">
+          <ActivePalletsWidget />
+        </Card>
       </div>
-      <div className={`${styles.dashboard__widget} ${styles['dashboard__widget--sidebar']}`}>
-        <ActivePalletsWidget />
+
+      {/* Inventory Management Section */}
+      <h2 style={sectionTitleStyles}>Gestión de Inventario</h2>
+      <div style={{ ...gridStyles, marginBottom: theme.spacing['3xl'] }}>
+        <Card variant="default" style={primaryWidgetStyles}>
+          <UnassignedBoxesWidget />
+        </Card>
+        <Card variant="default">
+          <AllPalletsWidget />
+        </Card>
       </div>
-      
-      {/* Secondary Operations Row */}
-      <div className={`${styles.dashboard__widget} ${styles['dashboard__widget--primary']}`}>
-        <UnassignedBoxesWidget />
+
+      {/* System & Operations Section */}
+      <h2 style={sectionTitleStyles}>Sistema y Operaciones</h2>
+      <div style={gridStyles}>
+        <Card variant="blur">
+          <SystemInfoWidget data={{}} />
+        </Card>
+        <Card variant="blur">
+          <IssueReporterWidget />
+        </Card>
+        <Card variant="blur">
+          <CreatePalletWidget />
+        </Card>
+        <Card variant="blur">
+          <CreateBoxWidget />
+        </Card>
+        <Card variant="blur">
+          <BoxDetailsWidget />
+        </Card>
       </div>
-      
-      {/* System & Reporting Row */}
-      <div className={styles.dashboard__widget}>
-        <SystemInfoWidget data={{}} />
-      </div>
-      <div className={styles.dashboard__widget}>
-        <IssueReporterWidget />
-      </div>
-      <div className={styles.dashboard__widget}>
-        <CreatePalletWidget />
-      </div>
-      
-      {/* Additional Features Row */}
-      <div className={styles.dashboard__widget}>
-        <CreateBoxWidget />
-      </div>
-      <div className={styles.dashboard__widget}>
-        <BoxDetailsWidget />
-      </div>
-      <div className={styles.dashboard__widget}>
-        <AllPalletsWidget />
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default Dashboard; 
