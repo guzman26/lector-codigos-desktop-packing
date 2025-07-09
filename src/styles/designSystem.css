@@ -28,6 +28,25 @@
   --color-error: #f87171;
   --color-warning: #fbbf24;
   
+  /* macOS-inspired theme variables for cards */
+  --bg-primary: #F5F5F7;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #FAFAFA;
+  --bg-blur: rgba(255, 255, 255, 0.72);
+  
+  --text-primary: #1D1D1F;
+  --text-secondary: #86868B;
+  --text-tertiary: #515154;
+  
+  --accent-blue: #0071E3;
+  --accent-green: #34C759;
+  --accent-red: #FF3B30;
+  --accent-orange: #FF9500;
+  
+  --border-light: rgba(0, 0, 0, 0.1);
+  --border-medium: rgba(0, 0, 0, 0.15);
+  --border-dark: rgba(0, 0, 0, 0.2)
+  
   /* Typography Scale */
   --font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
