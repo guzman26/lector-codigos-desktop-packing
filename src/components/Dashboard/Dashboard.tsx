@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '../ui';
 import { theme } from '../../styles/theme';
 import CodeInputWidget from '../Widgets/CodeInputWidget/CodeInputWidget';
+import { useCreateBox } from '../../hooks/useCreateBox';
 import ActivePalletsWidget from '../Widgets/ActivePalletsWidget/ActivePalletsWidget';
 import AllPalletsWidget from '../Widgets/AllPalletsWidget/AllPalletsWidget';
 import SystemInfoWidget from '../Widgets/SystemInfoWidget/SystemInfoWidget';
@@ -17,6 +18,23 @@ import CreatePalletWidget from '../Widgets/CreatePalletWidget/CreatePalletWidget
  * minimalistic interface suitable for factory environments.
  */
 const Dashboard: React.FC = () => {
+  // State for code history and latest code
+  const [codeData, setCodeData] = useState<{ latestCode: string; history: string[] }>({ 
+    latestCode: '', 
+    history: [] 
+  });
+  
+  // Use the createBox hook for processing scanned codes
+  const { submit: processCode } = useCreateBox();
+
+  // Handle new code submission
+  const handleCodeSubmit = (code: string) => {
+    // Update the history and latest code
+    setCodeData(prev => ({
+      latestCode: code,
+      history: [code, ...prev.history].slice(0, 10) // Keep only the last 10 codes
+    }));
+  };
   const gridStyles: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -41,7 +59,11 @@ const Dashboard: React.FC = () => {
       <h2 style={sectionTitleStyles}>Operaciones Principales</h2>
       <div style={{ ...gridStyles, marginBottom: theme.spacing['3xl'] }}>
         <Card variant="elevated" style={primaryWidgetStyles}>
-          <CodeInputWidget data={{ latestCode: '', history: [] }} />
+          <CodeInputWidget 
+            data={codeData} 
+            onCodeSubmit={handleCodeSubmit}
+            onProcessCode={processCode}
+          />
         </Card>
         <Card variant="elevated">
           <ActivePalletsWidget />

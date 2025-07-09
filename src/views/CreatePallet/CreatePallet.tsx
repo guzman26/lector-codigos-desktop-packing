@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import CreatePalletForm from '../../components/Forms/CreatePalletForm';
-import { Container, Button } from '../../components/ui';
+import { Container, Button, MacWindow } from '../../components/ui';
 import { ArrowLeft } from 'lucide-react';
 import { theme } from '../../styles/theme';
 
@@ -52,7 +52,14 @@ const CreatePallet: React.FC = () => {
       </header>
       
       <Container maxWidth="lg">
-        <CreatePalletForm />
+        <MacWindow 
+          title="Crear Pallet"
+          width="100%"
+          height="auto"
+          resizable={false}
+        >
+          <CreatePalletForm />
+        </MacWindow>
       </Container>
     </div>
   );

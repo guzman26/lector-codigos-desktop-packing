@@ -3,7 +3,7 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import CommandInput from '../../components/CommandInput/CommandInput';
 import { Link } from 'react-router-dom';
 import { useCommandHandler } from '../../hooks/useCommandHandler';
-import { Container, Button } from '../../components/ui';
+import { Container, Button, MacWindow } from '../../components/ui';
 import { Plus } from 'lucide-react';
 import { theme } from '../../styles/theme';
 
@@ -18,7 +18,6 @@ import { theme } from '../../styles/theme';
  * – Keeps JSX minimal by extracting helper hooks and components.
  */
 const MainTerminal: React.FC = () => {
-  const { handleCommand, lastCommandResult } = useCommandHandler();
 
   const mainStyles: React.CSSProperties = {
     minHeight: '100vh',
@@ -70,19 +69,24 @@ const MainTerminal: React.FC = () => {
       </header>
 
       <Container maxWidth="xl" style={contentStyles}>
-        <Dashboard />
-        
-        <div style={{ marginTop: 'auto' }}>
-          <CommandInput onSubmit={handleCommand} lastResult={lastCommandResult} />
-          
-          <div style={actionBarStyles}>
-            <Link to="/create-pallet" style={{ textDecoration: 'none' }}>
-              <Button icon={<Plus size={20} />} size="large">
-                Crear Pallet
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <MacWindow
+          title="Dashboard de Control"
+          width="100%"
+          height="auto"
+          resizable={false}
+          footer={
+            <div style={actionBarStyles}>
+              <Link to="/create-pallet" style={{ textDecoration: 'none' }}>
+                <Button icon={<Plus size={20} />} size="large">
+                  Crear Pallet
+                </Button>
+              </Link>
+            </div>
+          }
+        >
+          <Dashboard />
+        </MacWindow>
+
       </Container>
     </main>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button } from '../ui';
-import { Terminal, Play } from 'lucide-react';
+import { Button, ToggleSwitch } from '../ui';
+import { Play, ScanLine } from 'lucide-react';
 import { theme } from '../../styles/theme';
 import { motion } from 'framer-motion';
 
@@ -13,6 +13,7 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
   const [value, setValue] = useState('');
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [captureEnabled, setCaptureEnabled] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Focus the input field when component mounts
@@ -21,6 +22,42 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
       inputRef.current.focus();
     }
   }, []);
+  
+  // This effect would handle machine input capture when enabled
+  useEffect(() => {
+    if (!captureEnabled) return;
+    
+    // In a real implementation, this is where you would set up listeners
+    // for barcode scanners, RFID readers, or other input devices
+    const handleExternalInput = (event: KeyboardEvent) => {
+      // Only handle input when capture is enabled
+      if (captureEnabled) {
+        // For this demo, we'll simulate that any input not from the input element
+        // itself is coming from an external device
+        if (document.activeElement !== inputRef.current) {
+          // Prevent default to avoid triggering browser shortcuts
+          event.preventDefault();
+          
+          // Only handle alphanumeric and common scanner characters
+          if (/^[a-zA-Z0-9\-_]$/.test(event.key)) {
+            setValue(prev => prev + event.key);
+          } else if (event.key === 'Enter') {
+            // Auto-submit on Enter if there's a value
+            if (value.trim()) {
+              handleSubmit(new Event('submit') as any);
+            }
+          }
+        }
+      }
+    };
+    
+    // Add global keyboard listener to capture scanner input
+    window.addEventListener('keydown', handleExternalInput);
+    
+    return () => {
+      window.removeEventListener('keydown', handleExternalInput);
+    };
+  }, [captureEnabled, value]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,35 +92,17 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     }
   };
 
-  const terminalHeaderStyles: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    padding: theme.spacing.md,
-    borderBottom: `1px solid ${theme.colors.border.light}`,
-    backgroundColor: theme.colors.background.tertiary,
-    borderTopLeftRadius: theme.borderRadius.xl,
-    borderTopRightRadius: theme.borderRadius.xl,
-  };
-
-  const terminalButtonStyles: React.CSSProperties = {
-    width: '12px',
-    height: '12px',
-    borderRadius: '50%',
-    display: 'inline-block',
-  };
+  // Terminal header styling now handled by MacWindow component
 
   const terminalBodyStyles: React.CSSProperties = {
     backgroundColor: '#1E1E1E',
     color: '#D4D4D4',
     fontFamily: theme.typography.fontFamily.mono,
     fontSize: theme.typography.fontSize.sm,
-    padding: theme.spacing.lg,
-    minHeight: '200px',
-    maxHeight: '400px',
+    minHeight: '180px',
+    maxHeight: '350px',
     overflowY: 'auto',
-    borderBottomLeftRadius: theme.borderRadius.xl,
-    borderBottomRightRadius: theme.borderRadius.xl,
+    padding: 0,
   };
 
   const formStyles: React.CSSProperties = {
@@ -91,6 +110,24 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     gap: theme.spacing.sm,
     alignItems: 'center',
     marginTop: theme.spacing.md,
+  };
+  
+  const captureToggleStyles: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.md,
+    padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    borderRadius: theme.borderRadius.sm,
+  };
+  
+  const toggleLabelStyles: React.CSSProperties = {
+    color: '#D4D4D4',
+    fontSize: theme.typography.fontSize.xs,
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
   };
 
   const inputStyles: React.CSSProperties = {
@@ -123,25 +160,7 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
   };
 
   return (
-    <div style={{ marginTop: theme.spacing['2xl'] }}>
-      <div style={terminalHeaderStyles}>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-          <span style={{ ...terminalButtonStyles, backgroundColor: '#FF5F56' }}></span>
-          <span style={{ ...terminalButtonStyles, backgroundColor: '#FFBD2E' }}></span>
-          <span style={{ ...terminalButtonStyles, backgroundColor: '#27C93F' }}></span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.xs, marginLeft: 'auto' }}>
-          <Terminal size={16} color={theme.colors.text.secondary} />
-          <span style={{ 
-            fontSize: theme.typography.fontSize.sm, 
-            color: theme.colors.text.secondary,
-            fontWeight: theme.typography.fontWeight.medium,
-          }}>
-            Terminal de Comandos
-          </span>
-        </div>
-      </div>
-      
+    <div>
       <div style={terminalBodyStyles}>
         {/* Command result display */}
         {lastResult && (
@@ -178,6 +197,20 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
             Ejecutar
           </Button>
         </form>
+        
+        {/* Machine input capture toggle */}
+        <div style={captureToggleStyles}>
+          <span style={toggleLabelStyles}>
+            <ScanLine size={14} />
+            Captura automática
+          </span>
+          <ToggleSwitch 
+            checked={captureEnabled}
+            onChange={() => setCaptureEnabled(prev => !prev)}
+            label={captureEnabled ? 'Activada' : 'Desactivada'}
+            switchSize="small"
+          />
+        </div>
       </div>
     </div>
   );
