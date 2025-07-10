@@ -78,34 +78,6 @@ const ActivePalletsWidget: React.FC = () => {
     gap: theme.spacing.md,
   };
 
-  const metricsGridStyles: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
-  };
-
-  const metricCardStyles: React.CSSProperties = {
-    padding: theme.spacing.sm,
-    backgroundColor: theme.colors.background.tertiary,
-    borderRadius: theme.borderRadius.md,
-    textAlign: 'center',
-  };
-
-  const metricValueStyles: React.CSSProperties = {
-    fontSize: theme.typography.fontSize.xl,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.text.primary,
-    display: 'block',
-  };
-
-  const metricLabelStyles: React.CSSProperties = {
-    fontSize: theme.typography.fontSize.xs,
-    color: theme.colors.text.secondary,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-  };
-
   const headerStyles: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'space-between',
@@ -171,31 +143,6 @@ const ActivePalletsWidget: React.FC = () => {
         subtitle={loading ? 'Cargando...' : `${data.length} en proceso`}
       >
         <div style={widgetContentStyles}>
-          {/* Metrics summary */}
-          {metrics && !loading && (
-            <div style={metricsGridStyles}>
-              <div style={metricCardStyles}>
-                <span style={metricValueStyles}>{metrics.total}</span>
-                <span style={metricLabelStyles}>Activos</span>
-              </div>
-              <div style={metricCardStyles}>
-                <span style={metricValueStyles}>{Math.round(metrics.avgCapacity)}%</span>
-                <span style={metricLabelStyles}>Promedio</span>
-              </div>
-              <div style={{
-                ...metricCardStyles,
-                backgroundColor: metrics.nearFull > 0 ? theme.colors.accent.orange + '20' : metricCardStyles.backgroundColor
-              }}>
-                <span style={{
-                  ...metricValueStyles,
-                  color: metrics.nearFull > 0 ? theme.colors.accent.orange : metricValueStyles.color
-                }}>
-                  {metrics.nearFull}
-                </span>
-                <span style={metricLabelStyles}>Casi Llenos</span>
-              </div>
-            </div>
-          )}
 
           {/* Critical pallets warning */}
           {metrics?.criticalPallets && metrics.criticalPallets.length > 0 && (
@@ -334,7 +281,7 @@ const ActivePalletsWidget: React.FC = () => {
                 <PalletCard
                   key={pallet.id}
                   pallet={pallet}
-                  variant="detailed"
+                  variant="compact"
                   onSelect={handlePalletSelect}
                   isSelected={selectedPallet?.id === pallet.id}
                   showProgress={true}

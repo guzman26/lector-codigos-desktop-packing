@@ -4,7 +4,6 @@ import { theme } from '../../styles/theme';
 import CodeInputWidget from '../Widgets/CodeInputWidget/CodeInputWidget';
 import { useCreateBox } from '../../hooks/useCreateBox';
 import ActivePalletsWidget from '../Widgets/ActivePalletsWidget/ActivePalletsWidget';
-import AllPalletsWidget from '../Widgets/AllPalletsWidget/AllPalletsWidget';
 import SystemInfoWidget from '../Widgets/SystemInfoWidget/SystemInfoWidget';
 import IssueReporterWidget from '../Widgets/IssueReporterWidget/IssueReporterWidget';
 import CreateBoxWidget from '../Widgets/CreateBoxWidget/CreateBoxWidget';
@@ -65,19 +64,17 @@ const Dashboard: React.FC = () => {
             onProcessCode={processCode}
           />
         </Card>
-        <Card variant="elevated">
-          <ActivePalletsWidget />
-        </Card>
+        
       </div>
 
       {/* Inventory Management Section */}
       <h2 style={sectionTitleStyles}>Gestión de Inventario</h2>
       <div style={{ ...gridStyles, marginBottom: theme.spacing['3xl'] }}>
-        <Card variant="default" style={primaryWidgetStyles}>
+        <Card variant="default" >
           <UnassignedBoxesWidget />
         </Card>
-        <Card variant="default">
-          <AllPalletsWidget />
+        <Card variant="elevated" style={primaryWidgetStyles}>
+          <ActivePalletsWidget />
         </Card>
       </div>
 
@@ -95,9 +92,6 @@ const Dashboard: React.FC = () => {
         </Card>
         <Card variant="blur">
           <CreateBoxWidget />
-        </Card>
-        <Card variant="blur">
-          <BoxDetailsWidget />
         </Card>
       </div>
     </section>

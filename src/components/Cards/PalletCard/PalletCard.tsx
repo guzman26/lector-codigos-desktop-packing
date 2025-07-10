@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import type { Pallet } from '../../../types';
 import { theme } from '../../../styles/theme';
 import styles from './PalletCard.module.css';
-import { Package2, Calendar, Hash, MapPin, Boxes, AlertCircle } from 'lucide-react';
+import { Package2, Calendar, MapPin, Boxes, AlertCircle, Clock, Activity, Ruler } from 'lucide-react';
 
 interface PalletCardProps {
   pallet: Pallet;
@@ -106,11 +106,8 @@ export const PalletCard = memo<PalletCardProps>(({
       {/* Header with code and status */}
       <header className={styles.header}>
         <div className={styles.codeWrapper}>
-          <Package2 size={24} className={styles.icon} />
-          <div>
-            <h3 className={styles.code}>{pallet.codigo}</h3>
-            <span className={styles.id}>ID: {pallet.id}</span>
-          </div>
+          <Package2 size={variant === 'compact' ? 18 : 20} className={styles.icon} />
+          <h3 className={styles.code}>{pallet.codigo}</h3>
         </div>
         <span 
           className={styles.status}
@@ -127,21 +124,23 @@ export const PalletCard = memo<PalletCardProps>(({
         {/* Box count with visual indicator */}
         <div className={styles.boxCountSection}>
           <div className={styles.infoRow}>
-            <Boxes size={18} className={styles.icon} />
-            <span className={styles.label}>Cajas:</span>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Boxes size={variant === 'compact' ? 14 : 16} className={styles.icon} />
+              <span className={styles.label}>Cajas:</span>
+            </div>
             <span className={styles.value}>
-              <strong>{pallet.cantidadCajas}</strong> / {maxBoxes}
+              <strong>{pallet.cantidadCajas}</strong>/{maxBoxes}
+              {capacityPercentage >= 80 && (
+                <AlertCircle 
+                  size={variant === 'compact' ? 12 : 14} 
+                  style={{ color: capacityStatus.color, marginLeft: '4px' }}
+                  aria-label={capacityStatus.label}
+                />
+              )}
             </span>
-            {capacityPercentage >= 80 && (
-              <AlertCircle 
-                size={18} 
-                style={{ color: capacityStatus.color }}
-                aria-label={capacityStatus.label}
-              />
-            )}
           </div>
 
-          {showProgress && variant !== 'compact' && (
+          {showProgress && (
             <div className={styles.progressWrapper}>
               <div 
                 className={styles.progressBar}
@@ -166,65 +165,65 @@ export const PalletCard = memo<PalletCardProps>(({
           )}
         </div>
 
-        {variant !== 'compact' && (
-          <>
-            <div className={styles.infoRow}>
-              <MapPin size={16} className={styles.icon} />
-              <span className={styles.label}>Ubicación:</span>
-              <span className={styles.value}>{pallet.ubicacion}</span>
-            </div>
+        {/* Basic info combined in more compact way */}
+        <div className={styles.infoRow}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <MapPin size={variant === 'compact' ? 14 : 16} className={styles.icon} />
+            <span className={styles.label}>Ubicación:</span>
+          </div>
+          <span className={styles.value}>{pallet.ubicacion}</span>
+        </div>
 
-            <div className={styles.infoRow}>
-              <Calendar size={16} className={styles.icon} />
-              <span className={styles.label}>Creado:</span>
-              <span className={styles.value}>{formatDate(pallet.fechaCreacion)}</span>
+        <div className={styles.infoRow}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Calendar size={variant === 'compact' ? 14 : 16} className={styles.icon} />
+            <span className={styles.label}>Creado:</span>
+          </div>
+          <span className={styles.value}>{formatDate(pallet.fechaCreacion)}</span>
+        </div>
+        
+        {pallet.fechaCalibreFormato && (
+          <div className={styles.infoRow}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Ruler size={variant === 'compact' ? 14 : 16} className={styles.icon} />
+              <span className={styles.label}>Calibre:</span>
             </div>
+            <span className={styles.value}>{pallet.fechaCalibreFormato}</span>
+          </div>
+        )}
 
-            {variant === 'detailed' && pallet.fechaCalibreFormato && (
-              <div className={styles.infoRow}>
-                <Hash size={16} className={styles.icon} />
-                <span className={styles.label}>Formato:</span>
-                <span className={styles.value}>{pallet.fechaCalibreFormato}</span>
+        {/* Extra stats for detailed variant - more compact layout */}
+        {variant === 'detailed' && (
+          <footer className={styles.footer}>
+            <div className={styles.stat}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Clock size={14} className={styles.icon} />
+                <span className={styles.statLabel}>Tiempo activo</span>
               </div>
-            )}
-          </>
+              <span className={styles.statValue}>
+                {(() => {
+                  const created = new Date(pallet.fechaCreacion);
+                  const now = new Date();
+                  const hours = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60));
+                  return hours < 24 ? `${hours}h` : `${Math.floor(hours / 24)}d`;
+                })()}
+              </span>
+            </div>
+            <div className={styles.stat}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Activity size={14} className={styles.icon} />
+                <span className={styles.statLabel}>Tasa llenado</span>
+              </div>
+              <span className={styles.statValue}>
+                {pallet.cantidadCajas > 0 
+                  ? `${(pallet.cantidadCajas / ((new Date().getTime() - new Date(pallet.fechaCreacion).getTime()) / (1000 * 60 * 60))).toFixed(1)} cajas/h`
+                  : '0 cajas/h'
+                }
+              </span>
+            </div>
+          </footer>
         )}
       </div>
-
-      {/* Quick stats for detailed view */}
-      {variant === 'detailed' && (
-        <footer className={styles.footer}>
-          <div className={styles.stat}>
-            <span className={styles.statLabel}>Tiempo activo</span>
-            <span className={styles.statValue}>
-              {(() => {
-                const created = new Date(pallet.fechaCreacion);
-                const now = new Date();
-                const hours = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60));
-                return hours < 24 ? `${hours}h` : `${Math.floor(hours / 24)}d`;
-              })()}
-            </span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statLabel}>Tasa llenado</span>
-            <span className={styles.statValue}>
-              {pallet.cantidadCajas > 0 
-                ? `${(pallet.cantidadCajas / ((new Date().getTime() - new Date(pallet.fechaCreacion).getTime()) / (1000 * 60 * 60))).toFixed(1)} cajas/h`
-                : '0 cajas/h'
-              }
-            </span>
-          </div>
-        </footer>
-      )}
-
-      {/* Touch-friendly selection indicator */}
-      {onSelect && (
-        <div className={styles.selectionIndicator} aria-hidden="true">
-          <div className={styles.checkmark}>
-            {isSelected && '✓'}
-          </div>
-        </div>
-      )}
     </article>
   );
 });

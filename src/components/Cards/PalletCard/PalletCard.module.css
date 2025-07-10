@@ -4,13 +4,16 @@
   background: var(--bg-secondary, #FFFFFF);
   border: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
   border-radius: 12px;
-  padding: 24px;
+  padding: 16px;
   transition: all 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
   position: relative;
   overflow: hidden;
   
   /* Touch-friendly minimum height */
-  min-height: 160px;
+  height: fit-content;
+  
+  /* Allow height to adjust based on content */
+  min-height: auto;
   
   /* Ensure text is selectable for debugging but card is still clickable */
   user-select: none;
@@ -38,39 +41,47 @@
 .palletCard.selected {
   border-color: var(--accent-blue, #0071E3);
   border-width: 2px;
-  padding: 23px; /* Compensate for border width */
+  padding: 15px; /* Compensate for border width */
   background: var(--bg-tertiary, #FAFAFA);
   box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
 }
 
 /* Variants */
 .palletCard.compact {
-  padding: 20px;
-  min-height: 120px;
+  padding: 10px 12px;
+  /* Remove fixed height for compact variant */
+  min-height: auto;
 }
 
 .palletCard.compact .content {
-  margin-top: 12px;
+  margin-top: 8px;
+  gap: 4px;
 }
 
 .palletCard.detailed {
-  padding: 28px;
-  min-height: 240px;
+  padding: 20px;
+  /* Detailed variant can grow automatically too */
+  min-height: auto;
 }
 
 /* Header */
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 20px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0px;
+}
+
+.compact .header {
+  margin-bottom: 4px;
+  gap: 6px;
 }
 
 .codeWrapper {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
   flex: 1;
   min-width: 0;
 }
@@ -81,78 +92,95 @@
 }
 
 .code {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-primary, #1D1D1F);
-  margin: 0 0 4px 0;
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: 0.02em;
 }
 
+.compact .code {
+  font-size: 14px;
+}
+
 .id {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary, #86868B);
   font-weight: 500;
 }
 
-.compact .code {
-  font-size: 18px;
+.compact .id {
+  font-size: 10px;
 }
 
 /* Status badge */
 .status {
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
   font-weight: 600;
   color: white;
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  min-height: 32px;
+  min-height: 24px;
   display: inline-flex;
   align-items: center;
+}
+
+.compact .status {
+  padding: 3px 8px;
+  font-size: 9px;
+  min-height: 18px;
 }
 
 /* Content area */
 .content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 6px;
+  margin-top: 10px;
 }
 
 /* Box count section */
 .boxCountSection {
   background: var(--bg-tertiary, #FAFAFA);
-  border-radius: 8px;
-  padding: 16px;
-  margin: -8px -8px 8px -8px;
+  border-radius: 6px;
+  padding: 6px;
+  margin: 0 0 4px 0;
+  width: 100%;
+}
+
+.compact .boxCountSection {
+  padding: 4px;
+  margin: 2px 0;
 }
 
 /* Progress bar */
 .progressWrapper {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .progressBar {
   width: 100%;
-  height: 8px;
+  height: 6px;
   background: var(--border-light, rgba(0, 0, 0, 0.1));
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .progressFill {
   height: 100%;
   transition: width 350ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .capacityLabel {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -162,8 +190,14 @@
 .infoRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 28px;
+  gap: 6px;
+  min-height: 24px;
+  justify-content: space-between;
+}
+
+.compact .infoRow {
+  min-height: 16px;
+  gap: 4px;
 }
 
 .icon {
@@ -171,46 +205,66 @@
   flex-shrink: 0;
 }
 
+.compact .icon {
+  width: 12px;
+  height: 12px;
+}
+
 .label {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-secondary, #86868B);
   font-weight: 500;
-  min-width: 80px;
+  min-width: 60px;
+  margin-right: 4px;
+}
+
+.compact .label {
+  font-size: 10px;
+  min-width: 50px;
 }
 
 .value {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-primary, #1D1D1F);
   font-weight: 400;
-  flex: 1;
+  text-align: right;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.compact .value {
+  font-size: 10px;
+}
+
 .value strong {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
+}
+
+.compact .value strong {
+  font-size: 12px;
 }
 
 /* Footer stats */
 .footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 20px;
-  padding-top: 20px;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  width: 100%;
 }
 
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .statLabel {
-  font-size: 12px;
+  font-size: 10px;
   color: var(--text-secondary, #86868B);
   font-weight: 500;
   text-transform: uppercase;
@@ -218,7 +272,7 @@
 }
 
 .statValue {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary, #1D1D1F);
 }
@@ -276,41 +330,41 @@
 /* Touch screen optimizations */
 @media (pointer: coarse) {
   .palletCard {
-    padding: 28px;
-    min-height: 180px;
+    padding: 20px;
+    min-height: 160px;
   }
   
   .compact {
-    padding: 24px;
+    padding: 16px;
   }
   
   .infoRow {
-    min-height: 36px;
+    min-height: 32px;
   }
   
   .status {
-    min-height: 40px;
-    padding: 8px 20px;
-    font-size: 14px;
+    min-height: 32px;
+    padding: 6px 16px;
+    font-size: 13px;
   }
   
   .progressBar {
-    height: 12px;
+    height: 8px;
   }
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .code {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .label,
   .value {
-    font-size: 13px;
+    font-size: 12px;
   }
   
   .statValue {
-    font-size: 16px;
+    font-size: 14px;
   }
 }

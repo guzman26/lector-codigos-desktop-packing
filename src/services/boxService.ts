@@ -30,5 +30,24 @@ export const deleteBox = (boxCode: string) =>
   });
 
 export const getUnassignedBoxesInPacking = () =>
-  fetchJson<UnassignedBox[]>(`${API_BASE}/getUnassignedBoxesInPacking
-`); 
+  fetchJson<UnassignedBox[]>(`${API_BASE}/getUnassignedBoxesInPacking`);
+
+// ----------------- NEW: Box Pallet Operations -----------------
+
+/**
+ * Creates a single box pallet for an unassigned box
+ */
+export const createSingleBoxPallet = (boxCode: string, ubicacion: string) =>
+  fetchJson<{ success: boolean; message?: string; palletId?: string }>(`${API_BASE}/createSingleBoxPallet`, {
+    method: 'POST',
+    body: JSON.stringify({ boxCode, ubicacion }),
+  });
+
+/**
+ * Assigns a box to a compatible existing pallet
+ */
+export const assignBoxToCompatiblePallet = (codigo: string) =>
+  fetchJson<{ success: boolean; message?: string; palletId?: string }>(`${API_BASE}/assignBoxToCompatiblePallet`, {
+    method: 'POST',
+    body: JSON.stringify({ codigo }),
+  }); 

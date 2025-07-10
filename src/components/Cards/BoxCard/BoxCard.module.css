@@ -1,188 +1,238 @@
 /* BoxCard.module.css - Enhanced with collapsible design */
 
 .boxCard {
-  background: var(--bg-secondary, #FFFFFF);
-  border: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  /* Base macOS card styling */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  overflow: hidden;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   position: relative;
-  transition: all 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  
-  /* Touch-friendly minimum height */
-  min-height: 80px;
-  
-  /* Ensure text is selectable for debugging but card is still clickable */
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
 }
 
-/* Expanded state */
-.boxCard.expanded {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+.boxCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
-/* Clickable state */
-.boxCard.clickable {
-  cursor: pointer;
-  touch-action: manipulation;
+/* Variant styles */
+.compact {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
-.boxCard.clickable:hover {
-  border-color: var(--border-medium, rgba(0, 0, 0, 0.15));
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+.detailed {
+  padding: 20px;
+  border-radius: 16px;
 }
 
-.boxCard.clickable:active {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.expanded {
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);
 }
 
-/* Selected state */
-.boxCard.selected {
-  border-color: var(--accent-blue, #0071E3);
-  border-width: 2px;
-  background: var(--bg-tertiary, #FAFAFA);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
-}
-
-/* Variants */
-.boxCard.compact {
-  min-height: 60px;
-}
-
-.boxCard.compact .header {
-  padding: 12px 16px;
-}
-
-.boxCard.detailed {
-  min-height: 120px;
-}
-
-/* Header - Always visible */
+/* Header layout */
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: var(--bg-secondary, #FFFFFF);
-  position: relative;
+  align-items: flex-start;
 }
 
 .headerLeft {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   flex: 1;
-  min-width: 0;
 }
 
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+  gap: 8px;
 }
 
 /* Expand button */
 .expandButton {
-  width: 32px;
-  height: 32px;
-  padding: 0;
+  background: rgba(0, 0, 0, 0.05);
   border: none;
-  background: transparent;
+  border-radius: 6px;
+  padding: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  color: var(--text-secondary, #86868B);
-  transition: all 150ms ease;
-  flex-shrink: 0;
 }
 
 .expandButton:hover {
-  background: var(--bg-tertiary, #FAFAFA);
-  color: var(--text-primary, #1D1D1F);
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
 }
 
 .expandButton:active {
   transform: scale(0.95);
 }
 
-/* Code info section */
+/* Code and timestamp */
 .codeInfo {
   flex: 1;
-  min-width: 0;
 }
 
 .code {
   font-size: 17px;
   font-weight: 600;
-  color: var(--text-primary, #1D1D1F);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
+  color: #1F2937;
+  margin: 0 0 4px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 .timestamp {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 2px;
+  color: #6B7280;
   font-size: 13px;
-  color: var(--text-secondary, #86868B);
+  font-weight: 500;
 }
 
 .time {
-  color: var(--text-tertiary, #515154);
-  margin-left: 4px;
+  color: #9CA3AF;
 }
 
 /* Status badge */
 .status {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
   color: white;
-  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Essential info section - Always visible */
+/* Info grids */
 .essentialInfo {
-  padding: 0 20px 16px;
-  background: var(--bg-secondary, #FFFFFF);
+  margin-top: 12px;
 }
 
 .infoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
 }
 
 .infoItem {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 24px;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.infoItem .icon {
+  flex-shrink: 0;
+  color: #6B7280;
+}
+
+.label {
+  color: #6B7280;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.value {
+  color: #1F2937;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: auto;
 }
 
 /* Expanded content */
 .expandedContent {
-  background: var(--bg-tertiary, #FAFAFA);
-  padding: 16px 20px;
-  border-top: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
-  animation: slideDown 200ms ease-out;
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  animation: slideDown 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-@keyframes slideDown {
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+/* Action buttons section */
+.actionsSection {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  flex: 1;
+  min-width: 140px;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.actionButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.actionButton:hover::before {
+  left: 100%;
+}
+
+.actionButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.actionButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.actionMessage {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Animations */
+@keyframes slideIn {
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -193,131 +243,111 @@
   }
 }
 
-.detailsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
 }
 
-.detailItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  background: var(--bg-secondary, #FFFFFF);
-  border-radius: 6px;
-  min-height: 36px;
+/* Responsive design */
+@media (max-width: 768px) {
+  .boxCard {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .headerLeft {
+    gap: 8px;
+  }
+
+  .code {
+    font-size: 15px;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .detailsGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+  }
+  
+  .actionButton {
+    flex: none;
+    min-width: 100%;
+  }
 }
 
-/* Icons */
-.icon {
-  color: var(--text-secondary, #86868B);
-  flex-shrink: 0;
-}
+@media (max-width: 480px) {
+  .headerLeft {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 
-/* Labels and values */
-.label {
-  font-size: 13px;
-  color: var(--text-secondary, #86868B);
-  font-weight: 500;
-  margin-right: 4px;
-}
+  .expandButton {
+    align-self: flex-start;
+  }
 
-.value {
-  font-size: 14px;
-  color: var(--text-primary, #1D1D1F);
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .infoItem,
+  .detailItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 
-/* Selection indicator - Now in header */
-.selectionIndicator {
-  width: 32px;
-  height: 32px;
-}
-
-.checkmark {
-  width: 100%;
-  height: 100%;
-  border: 2px solid var(--border-medium, rgba(0, 0, 0, 0.15));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  transition: all 150ms ease;
-  background: white;
-}
-
-.selected .checkmark {
-  background: var(--accent-blue, #0071E3);
-  border-color: var(--accent-blue, #0071E3);
-}
-
-/* Focus states for accessibility */
-.boxCard:focus-visible {
-  outline: 3px solid rgba(0, 113, 227, 0.4);
-  outline-offset: 2px;
-}
-
-.expandButton:focus-visible {
-  outline: 2px solid rgba(0, 113, 227, 0.4);
-  outline-offset: 1px;
+  .value {
+    margin-left: 0;
+  }
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .boxCard {
-    border-width: 2px;
+    border: 2px solid #000;
+    background: #fff;
+    backdrop-filter: none;
   }
-  
-  .status {
-    border: 1px solid;
-  }
-  
-  .expandedContent {
-    border-top-width: 2px;
-  }
-}
 
-/* Touch screen optimizations */
-@media (pointer: coarse) {
-  .header {
-    padding: 20px;
-  }
-  
   .expandButton {
-    width: 44px;
-    height: 44px;
+    background: #f0f0f0;
+    border: 1px solid #000;
   }
-  
-  .infoItem,
-  .detailItem {
-    min-height: 44px;
-  }
-  
+
   .status {
-    min-height: 32px;
-    padding: 6px 16px;
+    border: 1px solid #000;
   }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .code {
-    font-size: 16px;
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .boxCard,
+  .expandButton,
+  .actionButton,
+  .expandedContent,
+  .actionMessage {
+    transition: none;
+    animation: none;
   }
-  
-  .label,
-  .value {
-    font-size: 13px;
+
+  .boxCard:hover {
+    transform: none;
   }
-  
-  .detailsGrid {
-    grid-template-columns: 1fr;
+
+  .actionButton:hover:not(:disabled) {
+    transform: none;
   }
 }

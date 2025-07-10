@@ -1,8 +1,6 @@
 import React from 'react';
 import Dashboard from '../../components/Dashboard/Dashboard';
-import CommandInput from '../../components/CommandInput/CommandInput';
 import { Link } from 'react-router-dom';
-import { useCommandHandler } from '../../hooks/useCommandHandler';
 import { Container, Button, MacWindow } from '../../components/ui';
 import { Plus } from 'lucide-react';
 import { theme } from '../../styles/theme';
@@ -74,16 +72,14 @@ const MainTerminal: React.FC = () => {
           width="100%"
           height="auto"
           resizable={false}
-          footer={
-            <div style={actionBarStyles}>
+        >
+          <div style={actionBarStyles}>
               <Link to="/create-pallet" style={{ textDecoration: 'none' }}>
                 <Button icon={<Plus size={20} />} size="large">
                   Crear Pallet
                 </Button>
               </Link>
             </div>
-          }
-        >
           <Dashboard />
         </MacWindow>
 

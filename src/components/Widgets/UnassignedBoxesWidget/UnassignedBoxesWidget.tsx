@@ -1,29 +1,27 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useUnassignedBoxesInPacking } from '../../../hooks/useUnassignedBoxesInPacking';
 import { BoxCard } from '../../Cards';
 import WidgetCard from '../WidgetCard';
 import Modal from '../../Modal';
 import { theme } from '../../../styles/theme';
-import { Package, AlertTriangle, Search, Filter, CheckSquare, Square, ArrowUp, ArrowDown, Calendar, Ruler, User } from 'lucide-react';
+import { Package, AlertTriangle, Search, Filter, ArrowUp, ArrowDown, Calendar, Ruler, User } from 'lucide-react';
 import type { UnassignedBox } from '../../../types';
 
 /**
- * UnassignedBoxesWidget - Enhanced
+ * UnassignedBoxesWidget - macOS-styled with enhanced UX
  * 
- * Improvements:
- * - Bulk selection and actions
- * - Advanced sorting options
- * - Filter by caliber, operator, date
- * - Collapsible box cards
- * - Better visual feedback
+ * Features:
+ * - Clean macOS-inspired design
+ * - Advanced sorting and filtering
+ * - Touch-optimized interactions
+ * - Elegant visual hierarchy
  * 
  * @rationale Operators need efficient ways to manage multiple boxes
  * and quickly find specific items in the factory environment
  */
 const UnassignedBoxesWidget: React.FC = () => {
-  const { data, loading, error } = useUnassignedBoxesInPacking();
+  const { data, loading, error, refresh } = useUnassignedBoxesInPacking();
   const [open, setOpen] = useState(false);
-  const [selectedBoxes, setSelectedBoxes] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'caliber' | 'operator'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -93,35 +91,8 @@ const UnassignedBoxesWidget: React.FC = () => {
     return sorted;
   }, [data, searchQuery, filterCaliber, filterOperator, sortBy, sortOrder]);
 
-  // Show only first 5 boxes in widget
-  const previewBoxes = processedBoxes.slice(0, 5);
-
-  const handleBoxSelect = useCallback((box: UnassignedBox) => {
-    setSelectedBoxes(prev => {
-      const next = new Set(prev);
-      if (next.has(box.codigo)) {
-        next.delete(box.codigo);
-      } else {
-        next.add(box.codigo);
-      }
-      return next;
-    });
-  }, []);
-
-  const handleSelectAll = useCallback(() => {
-    if (selectedBoxes.size === processedBoxes.length) {
-      setSelectedBoxes(new Set());
-    } else {
-      setSelectedBoxes(new Set(processedBoxes.map(box => box.codigo)));
-    }
-  }, [selectedBoxes, processedBoxes]);
-
-  const handleBulkAssign = useCallback(() => {
-    // Implement bulk assignment logic
-    console.log('Assigning boxes:', Array.from(selectedBoxes));
-    // Reset selection after action
-    setSelectedBoxes(new Set());
-  }, [selectedBoxes]);
+  // Show first 6 boxes in widget for better density
+  const previewBoxes = processedBoxes.slice(0, 6);
 
   const toggleSort = (field: typeof sortBy) => {
     if (sortBy === field) {
@@ -132,128 +103,142 @@ const UnassignedBoxesWidget: React.FC = () => {
     }
   };
 
-  // Styles
-  const widgetContentStyles: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing.md,
+  const handleModalClose = () => {
+    setOpen(false);
+    setSearchQuery('');
+    setShowFilters(false);
   };
 
-  const headerStyles: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-  };
+  // macOS-style components
+  const MacOSSearchInput = ({ value, onChange, placeholder }: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder: string }) => (
+    <div style={{
+      position: 'relative',
+      marginBottom: '16px',
+    }}>
+      <Search size={16} style={{
+        position: 'absolute',
+        left: '12px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        color: '#9CA3AF',
+      }} />
+      <input
+        type="text"
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{
+          width: '100%',
+          padding: '10px 12px 10px 36px',
+          fontSize: '14px',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
+          borderRadius: '8px',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          color: '#1F2937',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          transition: 'all 0.2s ease',
+          outline: 'none',
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = '#3B82F6';
+          e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = 'rgba(0, 0, 0, 0.1)';
+          e.target.style.boxShadow = 'none';
+        }}
+      />
+    </div>
+  );
 
-  const countBadgeStyles: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-    padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
-    backgroundColor: data.length > 10 ? theme.colors.accent.orange : theme.colors.accent.blue,
-    color: 'white',
-    borderRadius: theme.borderRadius.full,
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: theme.typography.fontWeight.semibold,
-  };
+  const MacOSButton = ({ 
+    children, 
+    onClick, 
+    variant = 'secondary', 
+    isActive = false,
+    style = {}
+  }: { 
+    children: React.ReactNode; 
+    onClick: () => void; 
+    variant?: 'primary' | 'secondary'; 
+    isActive?: boolean;
+    style?: React.CSSProperties;
+  }) => (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '8px 16px',
+        border: variant === 'primary' ? 'none' : `1px solid ${isActive ? '#3B82F6' : 'rgba(0, 0, 0, 0.1)'}`,
+        borderRadius: '8px',
+        background: variant === 'primary' 
+          ? 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)'
+          : isActive 
+            ? 'rgba(59, 130, 246, 0.1)' 
+            : 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        color: variant === 'primary' ? 'white' : isActive ? '#3B82F6' : '#6B7280',
+        fontSize: '13px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        transition: 'all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1)',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        boxShadow: variant === 'primary' ? '0 1px 3px rgba(0, 0, 0, 0.1)' : 'none',
+        ...style,
+      }}
+      onMouseEnter={(e) => {
+        if (variant === 'primary') {
+          e.currentTarget.style.transform = 'translateY(-1px)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+        } else {
+          e.currentTarget.style.backgroundColor = isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 0, 0, 0.05)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (variant === 'primary') {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+        } else {
+          e.currentTarget.style.backgroundColor = isActive ? 'rgba(59, 130, 246, 0.1)' : 'rgba(255, 255, 255, 0.8)';
+        }
+      }}
+    >
+      {children}
+    </button>
+  );
 
-  const viewAllButtonStyles: React.CSSProperties = {
-    backgroundColor: 'transparent',
-    border: `1px solid ${theme.colors.border.light}`,
-    color: theme.colors.accent.blue,
-    padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-    borderRadius: theme.borderRadius.md,
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: theme.typography.fontWeight.medium,
-    cursor: 'pointer',
-    transition: `all ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
-  };
-
-  const modalHeaderStyles: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
-  };
-
-  const searchBarStyles: React.CSSProperties = {
-    position: 'relative',
-  };
-
-  const searchInputStyles: React.CSSProperties = {
-    width: '100%',
-    padding: `${theme.spacing.md} ${theme.spacing.lg}`,
-    paddingLeft: '44px',
-    fontSize: theme.typography.fontSize.base,
-    border: `1px solid ${theme.colors.border.light}`,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.background.secondary,
-    color: theme.colors.text.primary,
-    transition: `all ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
-  };
-
-  const filterBarStyles: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-    flexWrap: 'wrap',
-  };
-
-  const filterSelectStyles: React.CSSProperties = {
-    padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-    paddingRight: '36px',
-    border: `1px solid ${theme.colors.border.light}`,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.background.secondary,
-    fontSize: theme.typography.fontSize.sm,
-    cursor: 'pointer',
-    appearance: 'none',
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2386868B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'right 12px center',
-  };
-
-  const sortButtonStyles = (isActive: boolean): React.CSSProperties => ({
-    padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-    border: `1px solid ${isActive ? theme.colors.accent.blue : theme.colors.border.light}`,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: isActive ? theme.colors.accent.blue : 'transparent',
-    color: isActive ? 'white' : theme.colors.text.primary,
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: theme.typography.fontWeight.medium,
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-    transition: `all ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
-  });
-
-  const bulkActionsStyles: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: theme.spacing.md,
-    backgroundColor: theme.colors.accent.blue + '10',
-    borderRadius: theme.borderRadius.md,
-    marginBottom: theme.spacing.md,
-  };
-
-  const emptyStateStyles: React.CSSProperties = {
-    textAlign: 'center',
-    padding: theme.spacing['2xl'],
-    color: theme.colors.text.secondary,
-  };
-
-  const boxListStyles: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing.md,
-    maxHeight: '60vh',
-    overflow: 'auto',
-    padding: theme.spacing.xs,
-    marginRight: `-${theme.spacing.xs}`,
-  };
+  const MacOSSelect = ({ value, onChange, options, placeholder }: {
+    value: string;
+    onChange: (value: string) => void;
+    options: { value: string; label: string }[];
+    placeholder: string;
+  }) => (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      style={{
+        width: '100%',
+        padding: '8px 12px',
+        fontSize: '13px',
+        border: '1px solid rgba(0, 0, 0, 0.1)',
+        borderRadius: '6px',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)',
+        color: '#1F2937',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        cursor: 'pointer',
+        outline: 'none',
+      }}
+    >
+      <option value="all">{placeholder}</option>
+      {options.map(option => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+      ))}
+    </select>
+  );
 
   return (
     <>
@@ -262,59 +247,92 @@ const UnassignedBoxesWidget: React.FC = () => {
         icon={<Package size={20} />}
         subtitle={loading ? 'Cargando...' : `${data.length} cajas en empaque`}
       >
-        <div style={widgetContentStyles}>
-          <div style={headerStyles}>
-            <span style={countBadgeStyles}>
-              {data.length > 10 && <AlertTriangle size={14} />}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              backgroundColor: data.length > 10 ? '#FEF3C7' : '#DBEAFE',
+              color: data.length > 10 ? '#92400E' : '#1E40AF',
+              borderRadius: '16px',
+              fontSize: '11px',
+              fontWeight: '700',
+              border: `1px solid ${data.length > 10 ? '#FCD34D' : '#93C5FD'}`,
+            }}>
+              {data.length > 10 && <AlertTriangle size={10} />}
               {data.length} {data.length === 1 ? 'caja' : 'cajas'}
-            </span>
-            <button
-              type="button"
-              style={viewAllButtonStyles}
+            </div>
+            
+            <MacOSButton
               onClick={() => setOpen(true)}
-              disabled={data.length === 0}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = theme.colors.background.tertiary;
-                e.currentTarget.style.borderColor = theme.colors.accent.blue;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = theme.colors.border.light;
+              variant="primary"
+              style={{ 
+                opacity: data.length === 0 ? 0.5 : 1,
+                padding: '6px 12px',
+                fontSize: '11px',
               }}
             >
               Ver todas
-            </button>
+            </MacOSButton>
           </div>
 
           {loading && (
-            <div style={emptyStateStyles}>
-              <p>Cargando cajas...</p>
+            <div style={{
+              textAlign: 'center',
+              padding: '20px',
+              color: '#6B7280',
+              fontSize: '12px',
+            }}>
+              <p style={{ margin: 0 }}>Cargando cajas...</p>
             </div>
           )}
 
           {error && (
-            <div style={{ ...emptyStateStyles, color: theme.colors.accent.red }}>
-              <AlertTriangle size={24} style={{ marginBottom: theme.spacing.sm }} />
-              <p>Error: {error.message}</p>
+            <div style={{
+              textAlign: 'center',
+              padding: '20px',
+              color: '#DC2626',
+              backgroundColor: 'rgba(220, 38, 38, 0.1)',
+              borderRadius: '6px',
+              border: '1px solid rgba(220, 38, 38, 0.2)',
+            }}>
+              <AlertTriangle size={20} style={{ marginBottom: '6px' }} />
+              <p style={{ margin: 0, fontSize: '12px' }}>Error: {error.message}</p>
             </div>
           )}
 
           {!loading && !error && data.length === 0 && (
-            <div style={emptyStateStyles}>
-              <Package size={32} style={{ opacity: 0.5, marginBottom: theme.spacing.sm }} />
-              <p>No hay cajas sin asignar</p>
+            <div style={{
+              textAlign: 'center',
+              padding: '24px 20px',
+              color: '#6B7280',
+            }}>
+              <Package size={24} style={{ opacity: 0.5, marginBottom: '8px' }} />
+              <p style={{ fontSize: '12px', margin: 0, fontWeight: '500' }}>No hay cajas sin asignar</p>
             </div>
           )}
 
           {!loading && !error && previewBoxes.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.sm }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
               {previewBoxes.map((box) => (
                 <BoxCard
                   key={box.codigo}
                   box={box}
                   variant="compact"
-                  onSelect={handleBoxSelect}
-                  isSelected={selectedBoxes.has(box.codigo)}
+                  showActions={false} // Hide actions in preview
+                  onActionComplete={() => {
+                    refresh();
+                  }}
                 />
               ))}
             </div>
@@ -324,209 +342,179 @@ const UnassignedBoxesWidget: React.FC = () => {
 
       <Modal 
         isOpen={open} 
-        onClose={() => {
-          setOpen(false);
-          setSearchQuery('');
-          setSelectedBoxes(new Set());
-          setShowFilters(false);
-        }} 
+        onClose={handleModalClose} 
         title="Todas las Cajas Sin Asignar"
         size="large"
       >
-        <div style={modalHeaderStyles}>
-          {/* Search bar */}
-          <div style={searchBarStyles}>
-            <Search 
-              size={20} 
-              style={{ 
-                position: 'absolute', 
-                left: theme.spacing.md, 
-                top: '50%', 
-                transform: 'translateY(-50%)',
-                color: theme.colors.text.secondary 
-              }} 
-            />
-            <input
-              type="text"
-              placeholder="Buscar por código, operario o calibre..."
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+          height: '100%',
+        }}>
+          {/* Search and Controls */}
+          <div style={{
+            padding: '16px 20px 0 20px',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
+            paddingBottom: '16px',
+          }}>
+            <MacOSSearchInput
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={searchInputStyles}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = theme.colors.accent.blue;
-                e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.accent.blue}20`;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = theme.colors.border.light;
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              placeholder="Buscar por código, operario o calibre..."
             />
-          </div>
 
-          {/* Filters and sorting */}
-          <div style={filterBarStyles}>
-            <button
-              style={{
-                ...sortButtonStyles(false),
-                gap: theme.spacing.xs,
-              }}
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter size={16} />
-              Filtros {showFilters ? '▲' : '▼'}
-            </button>
-
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: theme.spacing.sm }}>
-              <button
-                style={sortButtonStyles(sortBy === 'date')}
-                onClick={() => toggleSort('date')}
-              >
-                <Calendar size={16} />
-                Fecha
-                {sortBy === 'date' && (sortOrder === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />)}
-              </button>
-              <button
-                style={sortButtonStyles(sortBy === 'caliber')}
-                onClick={() => toggleSort('caliber')}
-              >
-                <Ruler size={16} />
-                Calibre
-                {sortBy === 'caliber' && (sortOrder === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />)}
-              </button>
-              <button
-                style={sortButtonStyles(sortBy === 'operator')}
-                onClick={() => toggleSort('operator')}
-              >
-                <User size={16} />
-                Operario
-                {sortBy === 'operator' && (sortOrder === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />)}
-              </button>
-            </div>
-          </div>
-
-          {/* Expanded filters */}
-          {showFilters && (
-            <div style={{ 
-              display: 'flex', 
-              gap: theme.spacing.md,
-              padding: theme.spacing.md,
-              backgroundColor: theme.colors.background.tertiary,
-              borderRadius: theme.borderRadius.md,
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
             }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ 
-                  display: 'block', 
-                  fontSize: theme.typography.fontSize.sm,
-                  color: theme.colors.text.secondary,
-                  marginBottom: theme.spacing.xs
-                }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                flexWrap: 'wrap',
+              }}>
+                <MacOSButton
+                  onClick={() => setShowFilters(!showFilters)}
+                  isActive={showFilters}
+                >
+                  <Filter size={14} />
+                  Filtros
+                </MacOSButton>
+
+                <MacOSButton
+                  onClick={() => toggleSort('date')}
+                  isActive={sortBy === 'date'}
+                >
+                  <Calendar size={14} />
+                  Fecha
+                  {sortBy === 'date' && (sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                </MacOSButton>
+
+                <MacOSButton
+                  onClick={() => toggleSort('caliber')}
+                  isActive={sortBy === 'caliber'}
+                >
+                  <Ruler size={14} />
                   Calibre
-                </label>
-                <select
-                  value={filterCaliber}
-                  onChange={(e) => setFilterCaliber(e.target.value)}
-                  style={filterSelectStyles}
-                >
-                  <option value="all">Todos los calibres</option>
-                  {calibers.map(cal => (
-                    <option key={cal} value={cal}>{cal}</option>
-                  ))}
-                </select>
-              </div>
+                  {sortBy === 'caliber' && (sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                </MacOSButton>
 
-              <div style={{ flex: 1 }}>
-                <label style={{ 
-                  display: 'block', 
-                  fontSize: theme.typography.fontSize.sm,
-                  color: theme.colors.text.secondary,
-                  marginBottom: theme.spacing.xs
-                }}>
+                <MacOSButton
+                  onClick={() => toggleSort('operator')}
+                  isActive={sortBy === 'operator'}
+                >
+                  <User size={14} />
                   Operario
-                </label>
-                <select
-                  value={filterOperator}
-                  onChange={(e) => setFilterOperator(e.target.value)}
-                  style={filterSelectStyles}
-                >
-                  <option value="all">Todos los operarios</option>
-                  {operators.map(op => (
-                    <option key={op} value={op}>{op}</option>
-                  ))}
-                </select>
+                  {sortBy === 'operator' && (sortOrder === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                </MacOSButton>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Results info */}
-        <div style={{ 
-          fontSize: theme.typography.fontSize.sm, 
-          color: theme.colors.text.secondary,
-          marginBottom: theme.spacing.md,
-        }}>
-          Mostrando {processedBoxes.length} de {data.length} cajas
-          {selectedBoxes.size > 0 && ` • ${selectedBoxes.size} seleccionadas`}
-        </div>
+            {showFilters && (
+              <div style={{
+                marginTop: '16px',
+                padding: '16px',
+                backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                borderRadius: '8px',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+              }}>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '12px',
+                    color: '#6B7280',
+                    marginBottom: '6px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Calibre
+                  </label>
+                  <MacOSSelect
+                    value={filterCaliber}
+                    onChange={setFilterCaliber}
+                    options={calibers.map(cal => ({ value: cal, label: cal }))}
+                    placeholder="Todos los calibres"
+                  />
+                </div>
 
-        {/* Bulk actions bar */}
-        {selectedBoxes.size > 0 && (
-          <div style={bulkActionsStyles}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.md }}>
-              <button
-                onClick={handleSelectAll}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: theme.spacing.xs,
-                  background: 'none',
-                  border: 'none',
-                  color: theme.colors.accent.blue,
-                  cursor: 'pointer',
-                  fontSize: theme.typography.fontSize.sm,
-                  fontWeight: theme.typography.fontWeight.medium,
-                }}
-              >
-                {selectedBoxes.size === processedBoxes.length ? <CheckSquare size={18} /> : <Square size={18} />}
-                {selectedBoxes.size === processedBoxes.length ? 'Deseleccionar todo' : 'Seleccionar todo'}
-              </button>
-              <span style={{ color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.sm }}>
-                {selectedBoxes.size} {selectedBoxes.size === 1 ? 'caja seleccionada' : 'cajas seleccionadas'}
-              </span>
-            </div>
-
-            <button
-              onClick={handleBulkAssign}
-              style={{
-                ...viewAllButtonStyles,
-                backgroundColor: theme.colors.accent.blue,
-                color: 'white',
-                border: 'none',
-              }}
-            >
-              Asignar a Pallet
-            </button>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '12px',
+                    color: '#6B7280',
+                    marginBottom: '6px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Operario
+                  </label>
+                  <MacOSSelect
+                    value={filterOperator}
+                    onChange={setFilterOperator}
+                    options={operators.map(op => ({ value: op, label: op }))}
+                    placeholder="Todos los operarios"
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Box list */}
-        <div style={boxListStyles}>
-          {processedBoxes.length === 0 ? (
-            <div style={emptyStateStyles}>
-              <Search size={32} style={{ opacity: 0.5, marginBottom: theme.spacing.sm }} />
-              <p>No se encontraron cajas que coincidan con los filtros</p>
-            </div>
-          ) : (
-            processedBoxes.map((box) => (
-              <BoxCard
-                key={box.codigo}
-                box={box}
-                variant="default"
-                onSelect={handleBoxSelect}
-                isSelected={selectedBoxes.has(box.codigo)}
-                defaultExpanded={false}
-              />
-            ))
-          )}
+          {/* Results info */}
+          <div style={{
+            padding: '0 20px',
+            fontSize: '13px',
+            color: '#6B7280',
+            fontWeight: '500',
+          }}>
+            Mostrando {processedBoxes.length} de {data.length} cajas
+          </div>
+
+          {/* Box list */}
+          <div style={{
+            flex: 1,
+            overflow: 'auto',
+            padding: '0 20px 20px 20px',
+          }}>
+            {processedBoxes.length === 0 ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '64px 32px',
+                color: '#6B7280',
+              }}>
+                <Search size={32} style={{ opacity: 0.5, marginBottom: '16px' }} />
+                <p style={{ fontSize: '14px', margin: 0 }}>No se encontraron cajas que coincidan con los filtros</p>
+              </div>
+            ) : (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}>
+                {processedBoxes.map((box) => (
+                  <BoxCard
+                    key={box.codigo}
+                    box={box}
+                    variant="default"
+                    defaultExpanded={false}
+                    showActions={true}
+                    onActionComplete={() => {
+                      refresh();
+                      setOpen(false);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </Modal>
     </>
