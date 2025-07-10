@@ -1,0 +1,316 @@
+/* PalletCard.module.css - Industrial touchscreen-optimized styles */
+
+.palletCard {
+  background: var(--bg-secondary, #FFFFFF);
+  border: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  
+  /* Touch-friendly minimum height */
+  min-height: 160px;
+  
+  /* Ensure text is selectable for debugging but card is still clickable */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Clickable state */
+.palletCard.clickable {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.palletCard.clickable:hover {
+  border-color: var(--border-medium, rgba(0, 0, 0, 0.15));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.palletCard.clickable:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Selected state */
+.palletCard.selected {
+  border-color: var(--accent-blue, #0071E3);
+  border-width: 2px;
+  padding: 23px; /* Compensate for border width */
+  background: var(--bg-tertiary, #FAFAFA);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+/* Variants */
+.palletCard.compact {
+  padding: 20px;
+  min-height: 120px;
+}
+
+.palletCard.compact .content {
+  margin-top: 12px;
+}
+
+.palletCard.detailed {
+  padding: 28px;
+  min-height: 240px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.codeWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.codeWrapper > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.code {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary, #1D1D1F);
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+.id {
+  font-size: 13px;
+  color: var(--text-secondary, #86868B);
+  font-weight: 500;
+}
+
+.compact .code {
+  font-size: 18px;
+}
+
+/* Status badge */
+.status {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Content area */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Box count section */
+.boxCountSection {
+  background: var(--bg-tertiary, #FAFAFA);
+  border-radius: 8px;
+  padding: 16px;
+  margin: -8px -8px 8px -8px;
+}
+
+/* Progress bar */
+.progressWrapper {
+  margin-top: 12px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: var(--border-light, rgba(0, 0, 0, 0.1));
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  transition: width 350ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  border-radius: 4px;
+}
+
+.capacityLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Info rows */
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.icon {
+  color: var(--text-secondary, #86868B);
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--text-secondary, #86868B);
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.value {
+  font-size: 14px;
+  color: var(--text-primary, #1D1D1F);
+  font-weight: 400;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.value strong {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Footer stats */
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--text-secondary, #86868B);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1D1D1F);
+}
+
+/* Selection indicator */
+.selectionIndicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+}
+
+.checkmark {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--border-medium, rgba(0, 0, 0, 0.15));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  transition: all 150ms ease;
+  background: white;
+}
+
+.selected .checkmark {
+  background: var(--accent-blue, #0071E3);
+  border-color: var(--accent-blue, #0071E3);
+}
+
+/* Focus states for accessibility */
+.palletCard:focus-visible {
+  outline: 3px solid rgba(0, 113, 227, 0.4);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .palletCard {
+    border-width: 2px;
+  }
+  
+  .status {
+    border: 1px solid;
+  }
+  
+  .progressBar {
+    border: 1px solid;
+  }
+}
+
+/* Touch screen optimizations */
+@media (pointer: coarse) {
+  .palletCard {
+    padding: 28px;
+    min-height: 180px;
+  }
+  
+  .compact {
+    padding: 24px;
+  }
+  
+  .infoRow {
+    min-height: 36px;
+  }
+  
+  .status {
+    min-height: 40px;
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+  
+  .progressBar {
+    height: 12px;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .code {
+    font-size: 18px;
+  }
+  
+  .label,
+  .value {
+    font-size: 13px;
+  }
+  
+  .statValue {
+    font-size: 16px;
+  }
+}

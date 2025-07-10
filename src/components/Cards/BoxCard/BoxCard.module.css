@@ -1,0 +1,323 @@
+/* BoxCard.module.css - Enhanced with collapsible design */
+
+.boxCard {
+  background: var(--bg-secondary, #FFFFFF);
+  border: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  transition: all 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  
+  /* Touch-friendly minimum height */
+  min-height: 80px;
+  
+  /* Ensure text is selectable for debugging but card is still clickable */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Expanded state */
+.boxCard.expanded {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Clickable state */
+.boxCard.clickable {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.boxCard.clickable:hover {
+  border-color: var(--border-medium, rgba(0, 0, 0, 0.15));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.boxCard.clickable:active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Selected state */
+.boxCard.selected {
+  border-color: var(--accent-blue, #0071E3);
+  border-width: 2px;
+  background: var(--bg-tertiary, #FAFAFA);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+/* Variants */
+.boxCard.compact {
+  min-height: 60px;
+}
+
+.boxCard.compact .header {
+  padding: 12px 16px;
+}
+
+.boxCard.detailed {
+  min-height: 120px;
+}
+
+/* Header - Always visible */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--bg-secondary, #FFFFFF);
+  position: relative;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Expand button */
+.expandButton {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--text-secondary, #86868B);
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+
+.expandButton:hover {
+  background: var(--bg-tertiary, #FAFAFA);
+  color: var(--text-primary, #1D1D1F);
+}
+
+.expandButton:active {
+  transform: scale(0.95);
+}
+
+/* Code info section */
+.codeInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.code {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary, #1D1D1F);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.timestamp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-secondary, #86868B);
+}
+
+.time {
+  color: var(--text-tertiary, #515154);
+  margin-left: 4px;
+}
+
+/* Status badge */
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Essential info section - Always visible */
+.essentialInfo {
+  padding: 0 20px 16px;
+  background: var(--bg-secondary, #FFFFFF);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+}
+
+/* Expanded content */
+.expandedContent {
+  background: var(--bg-tertiary, #FAFAFA);
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  animation: slideDown 200ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--bg-secondary, #FFFFFF);
+  border-radius: 6px;
+  min-height: 36px;
+}
+
+/* Icons */
+.icon {
+  color: var(--text-secondary, #86868B);
+  flex-shrink: 0;
+}
+
+/* Labels and values */
+.label {
+  font-size: 13px;
+  color: var(--text-secondary, #86868B);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.value {
+  font-size: 14px;
+  color: var(--text-primary, #1D1D1F);
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Selection indicator - Now in header */
+.selectionIndicator {
+  width: 32px;
+  height: 32px;
+}
+
+.checkmark {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--border-medium, rgba(0, 0, 0, 0.15));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  transition: all 150ms ease;
+  background: white;
+}
+
+.selected .checkmark {
+  background: var(--accent-blue, #0071E3);
+  border-color: var(--accent-blue, #0071E3);
+}
+
+/* Focus states for accessibility */
+.boxCard:focus-visible {
+  outline: 3px solid rgba(0, 113, 227, 0.4);
+  outline-offset: 2px;
+}
+
+.expandButton:focus-visible {
+  outline: 2px solid rgba(0, 113, 227, 0.4);
+  outline-offset: 1px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .boxCard {
+    border-width: 2px;
+  }
+  
+  .status {
+    border: 1px solid;
+  }
+  
+  .expandedContent {
+    border-top-width: 2px;
+  }
+}
+
+/* Touch screen optimizations */
+@media (pointer: coarse) {
+  .header {
+    padding: 20px;
+  }
+  
+  .expandButton {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .infoItem,
+  .detailItem {
+    min-height: 44px;
+  }
+  
+  .status {
+    min-height: 32px;
+    padding: 6px 16px;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .code {
+    font-size: 16px;
+  }
+  
+  .label,
+  .value {
+    font-size: 13px;
+  }
+  
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+}

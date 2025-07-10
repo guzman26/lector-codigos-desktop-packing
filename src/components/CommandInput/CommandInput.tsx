@@ -1,48 +1,55 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, ToggleSwitch } from '../ui';
-import { Play, ScanLine } from 'lucide-react';
+import { Play, ScanLine, History, Terminal } from 'lucide-react';
 import { theme } from '../../styles/theme';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CommandInputProps {
   onSubmit: (command: string) => void;
   lastResult: string | null;
 }
 
+/**
+ * Enhanced CommandInput Component
+ * 
+ * Improvements for factory touchscreen terminals:
+ * - Larger touch targets for gloved hands
+ * - Visual feedback for scanner input mode
+ * - Quick access to command history
+ * - Auto-submit option for scanner input
+ * - Clear visual states and feedback
+ * 
+ * @rationale Factory operators need quick, reliable input methods
+ * that work with barcode scanners and manual entry
+ */
 const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => {
   const [value, setValue] = useState('');
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [captureEnabled, setCaptureEnabled] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [autoSubmit, setAutoSubmit] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Focus the input field when component mounts
   useEffect(() => {
-    if (inputRef.current) {
+    if (inputRef.current && !captureEnabled) {
       inputRef.current.focus();
     }
-  }, []);
+  }, [captureEnabled]);
   
-  // This effect would handle machine input capture when enabled
+  // Handle machine input capture
   useEffect(() => {
     if (!captureEnabled) return;
     
-    // In a real implementation, this is where you would set up listeners
-    // for barcode scanners, RFID readers, or other input devices
     const handleExternalInput = (event: KeyboardEvent) => {
-      // Only handle input when capture is enabled
       if (captureEnabled) {
-        // For this demo, we'll simulate that any input not from the input element
-        // itself is coming from an external device
         if (document.activeElement !== inputRef.current) {
-          // Prevent default to avoid triggering browser shortcuts
           event.preventDefault();
           
-          // Only handle alphanumeric and common scanner characters
           if (/^[a-zA-Z0-9\-_]$/.test(event.key)) {
             setValue(prev => prev + event.key);
-          } else if (event.key === 'Enter') {
-            // Auto-submit on Enter if there's a value
+          } else if (event.key === 'Enter' && autoSubmit) {
             if (value.trim()) {
               handleSubmit(new Event('submit') as any);
             }
@@ -51,28 +58,23 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
       }
     };
     
-    // Add global keyboard listener to capture scanner input
     window.addEventListener('keydown', handleExternalInput);
-    
-    return () => {
-      window.removeEventListener('keydown', handleExternalInput);
-    };
-  }, [captureEnabled, value]);
+    return () => window.removeEventListener('keydown', handleExternalInput);
+  }, [captureEnabled, value, autoSubmit]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!value.trim()) return;
     
-    // Add to history and reset
     const trimmedValue = value.trim();
-    setHistory((prev) => [trimmedValue, ...prev.slice(0, 9)]);
+    setHistory((prev) => [trimmedValue, ...prev.filter(h => h !== trimmedValue).slice(0, 9)]);
     onSubmit(trimmedValue);
     setValue('');
     setHistoryIndex(-1);
+    setShowHistory(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Handle command history navigation with arrow keys
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       const nextIndex = Math.min(historyIndex + 1, history.length - 1);
@@ -92,42 +94,74 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     }
   };
 
-  // Terminal header styling now handled by MacWindow component
+  const selectFromHistory = (command: string) => {
+    setValue(command);
+    setShowHistory(false);
+    inputRef.current?.focus();
+  };
+
+  const terminalContainerStyles: React.CSSProperties = {
+    backgroundColor: '#1E1E1E',
+    borderRadius: theme.borderRadius.lg,
+    overflow: 'hidden',
+    position: 'relative',
+  };
+
+  const terminalHeaderStyles: React.CSSProperties = {
+    backgroundColor: '#2D2D2D',
+    padding: `${theme.spacing.sm} ${theme.spacing.md}`,
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    borderBottom: '1px solid #3E3E3E',
+  };
 
   const terminalBodyStyles: React.CSSProperties = {
-    backgroundColor: '#1E1E1E',
     color: '#D4D4D4',
     fontFamily: theme.typography.fontFamily.mono,
-    fontSize: theme.typography.fontSize.sm,
-    minHeight: '180px',
-    maxHeight: '350px',
+    fontSize: theme.typography.fontSize.base,
+    minHeight: '200px',
+    maxHeight: '400px',
     overflowY: 'auto',
-    padding: 0,
+    padding: theme.spacing.md,
   };
 
   const formStyles: React.CSSProperties = {
     display: 'flex',
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
     alignItems: 'center',
-    marginTop: theme.spacing.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.sm,
+    border: captureEnabled ? '2px solid #4EC9B0' : '1px solid transparent',
+    transition: `all ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
   };
-  
-  const captureToggleStyles: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.md,
+
+  const captureIndicatorStyles: React.CSSProperties = {
+    position: 'absolute',
+    top: theme.spacing.sm,
+    right: theme.spacing.sm,
     padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
-    backgroundColor: 'rgba(255, 255, 255, 0.07)',
-    borderRadius: theme.borderRadius.sm,
-  };
-  
-  const toggleLabelStyles: React.CSSProperties = {
-    color: '#D4D4D4',
+    backgroundColor: '#4EC9B0',
+    color: '#1E1E1E',
+    borderRadius: theme.borderRadius.full,
     fontSize: theme.typography.fontSize.xs,
+    fontWeight: theme.typography.fontWeight.semibold,
     display: 'flex',
     alignItems: 'center',
     gap: theme.spacing.xs,
+    animation: captureEnabled ? 'pulse 2s infinite' : 'none',
+  };
+  
+  const controlsStyles: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: theme.borderRadius.md,
+    borderTop: '1px solid #3E3E3E',
   };
 
   const inputStyles: React.CSSProperties = {
@@ -137,14 +171,15 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     outline: 'none',
     color: '#D4D4D4',
     fontFamily: theme.typography.fontFamily.mono,
-    fontSize: theme.typography.fontSize.sm,
-    padding: `${theme.spacing.xs} 0`,
+    fontSize: theme.typography.fontSize.base,
+    padding: `${theme.spacing.sm} 0`,
+    minHeight: '44px',
   };
 
   const promptStyles: React.CSSProperties = {
     color: '#4EC9B0',
     fontFamily: theme.typography.fontFamily.mono,
-    fontSize: theme.typography.fontSize.sm,
+    fontSize: theme.typography.fontSize.lg,
     fontWeight: theme.typography.fontWeight.bold,
   };
 
@@ -154,13 +189,76 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     color: '#D4D4D4',
     whiteSpace: 'pre-wrap',
     marginBottom: theme.spacing.md,
-    padding: theme.spacing.sm,
+    padding: theme.spacing.md,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: theme.borderRadius.sm,
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+  };
+
+  const historyButtonStyles: React.CSSProperties = {
+    padding: theme.spacing.sm,
+    backgroundColor: 'transparent',
+    border: '1px solid #3E3E3E',
+    borderRadius: theme.borderRadius.sm,
+    color: '#D4D4D4',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '44px',
+    minHeight: '44px',
+    transition: `all ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
+  };
+
+  const historyDropdownStyles: React.CSSProperties = {
+    position: 'absolute',
+    bottom: '100%',
+    left: 0,
+    right: 0,
+    marginBottom: theme.spacing.sm,
+    backgroundColor: '#2D2D2D',
+    border: '1px solid #3E3E3E',
+    borderRadius: theme.borderRadius.md,
+    maxHeight: '240px',
+    overflowY: 'auto',
+    zIndex: 10,
+    boxShadow: theme.colors.shadow.large,
+  };
+
+  const historyItemStyles: React.CSSProperties = {
+    padding: `${theme.spacing.sm} ${theme.spacing.md}`,
+    cursor: 'pointer',
+    transition: `background-color ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
+    fontFamily: theme.typography.fontFamily.mono,
+    fontSize: theme.typography.fontSize.sm,
+    borderBottom: '1px solid #3E3E3E',
   };
 
   return (
-    <div>
+    <div style={terminalContainerStyles}>
+      {/* Terminal header */}
+      <div style={terminalHeaderStyles}>
+        <Terminal size={16} style={{ color: '#4EC9B0' }} />
+        <span style={{ fontSize: theme.typography.fontSize.sm, color: '#888' }}>
+          Terminal de Comandos
+        </span>
+      </div>
+
+      {/* Capture indicator */}
+      <AnimatePresence>
+        {captureEnabled && (
+          <motion.div
+            style={captureIndicatorStyles}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+          >
+            <ScanLine size={14} />
+            ESCÁNER ACTIVO
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div style={terminalBodyStyles}>
         {/* Command result display */}
         {lastResult && (
@@ -174,44 +272,123 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
           </motion.pre>
         )}
         
-        {/* Command input with terminal styling */}
-        <form style={formStyles} onSubmit={handleSubmit}>
-          <span style={promptStyles}>$</span>
-          <input
-            ref={inputRef}
-            style={inputStyles}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ingrese comando..."
-            spellCheck="false"
-            autoComplete="off"
-            aria-label="Command input"
-          />
-          <Button 
-            type="submit"
-            size="small"
-            variant="ghost"
-            icon={<Play size={16} />}
-          >
-            Ejecutar
-          </Button>
-        </form>
+        {/* Command input form */}
+        <div style={{ position: 'relative' }}>
+          <form style={formStyles} onSubmit={handleSubmit}>
+            <span style={promptStyles}>$</span>
+            <input
+              ref={inputRef}
+              style={inputStyles}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={captureEnabled ? "Esperando entrada del escáner..." : "Ingrese comando..."}
+              spellCheck="false"
+              autoComplete="off"
+              aria-label="Command input"
+              disabled={captureEnabled}
+            />
+            <button
+              type="button"
+              style={historyButtonStyles}
+              onClick={() => setShowHistory(!showHistory)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.borderColor = '#4EC9B0';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderColor = '#3E3E3E';
+              }}
+              aria-label="Command history"
+              title="Historial de comandos"
+            >
+              <History size={20} />
+            </button>
+            <Button 
+              type="submit"
+              size="medium"
+              variant="primary"
+              icon={<Play size={18} />}
+              disabled={!value.trim()}
+            >
+              Ejecutar
+            </Button>
+          </form>
+
+          {/* History dropdown */}
+          <AnimatePresence>
+            {showHistory && history.length > 0 && (
+              <motion.div
+                style={historyDropdownStyles}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+              >
+                {history.map((cmd, index) => (
+                  <div
+                    key={index}
+                    style={historyItemStyles}
+                    onClick={() => selectFromHistory(cmd)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {cmd}
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
         
-        {/* Machine input capture toggle */}
-        <div style={captureToggleStyles}>
-          <span style={toggleLabelStyles}>
-            <ScanLine size={14} />
-            Captura automática
-          </span>
-          <ToggleSwitch 
-            checked={captureEnabled}
-            onChange={() => setCaptureEnabled(prev => !prev)}
-            label={captureEnabled ? 'Activada' : 'Desactivada'}
-            switchSize="small"
-          />
+        {/* Scanner controls */}
+        <div style={controlsStyles}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.sm, flex: 1 }}>
+            <ScanLine size={20} style={{ color: captureEnabled ? '#4EC9B0' : '#888' }} />
+            <span style={{ 
+              color: '#D4D4D4', 
+              fontSize: theme.typography.fontSize.sm,
+              fontWeight: theme.typography.fontWeight.medium 
+            }}>
+              Captura de Escáner
+            </span>
+            <ToggleSwitch 
+              checked={captureEnabled}
+              onChange={() => setCaptureEnabled(prev => !prev)}
+              label=""
+              switchSize="medium"
+            />
+          </div>
+          
+          {captureEnabled && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.sm }}>
+              <span style={{ color: '#888', fontSize: theme.typography.fontSize.xs }}>
+                Auto-enviar:
+              </span>
+              <ToggleSwitch 
+                checked={autoSubmit}
+                onChange={() => setAutoSubmit(prev => !prev)}
+                label=""
+                switchSize="small"
+              />
+            </div>
+          )}
         </div>
       </div>
+
+      <style>
+        {`
+          @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+          }
+        `}
+      </style>
     </div>
   );
 };
