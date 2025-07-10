@@ -1,36 +1,38 @@
-/* BoxCard.module.css - Industrial touchscreen-optimized styles */
+/* BoxCard.module.css - Enhanced with collapsible design */
 
 .boxCard {
   background: var(--bg-secondary, #FFFFFF);
   border: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
   border-radius: 12px;
-  padding: 20px;
-  transition: all 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  position: relative;
   overflow: hidden;
+  position: relative;
+  transition: all 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
   
   /* Touch-friendly minimum height */
-  min-height: 120px;
+  min-height: 80px;
   
   /* Ensure text is selectable for debugging but card is still clickable */
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Expanded state */
+.boxCard.expanded {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
 /* Clickable state */
 .boxCard.clickable {
   cursor: pointer;
-  touch-action: manipulation; /* Optimize for touch */
+  touch-action: manipulation;
 }
 
 .boxCard.clickable:hover {
   border-color: var(--border-medium, rgba(0, 0, 0, 0.15));
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
 }
 
 .boxCard.clickable:active {
-  transform: translateY(0);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -38,120 +40,200 @@
 .boxCard.selected {
   border-color: var(--accent-blue, #0071E3);
   border-width: 2px;
-  padding: 19px; /* Compensate for border width */
   background: var(--bg-tertiary, #FAFAFA);
   box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
 }
 
 /* Variants */
 .boxCard.compact {
-  padding: 16px;
-  min-height: 80px;
+  min-height: 60px;
 }
 
-.boxCard.compact .content {
-  margin-top: 8px;
+.boxCard.compact .header {
+  padding: 12px 16px;
 }
 
 .boxCard.detailed {
-  padding: 24px;
-  min-height: 160px;
+  min-height: 120px;
 }
 
-/* Header */
+/* Header - Always visible */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  padding: 16px 20px;
+  background: var(--bg-secondary, #FFFFFF);
+  position: relative;
 }
 
-.codeWrapper {
+.headerLeft {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
-  min-width: 0; /* Allow text truncation */
+  min-width: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Expand button */
+.expandButton {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--text-secondary, #86868B);
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+
+.expandButton:hover {
+  background: var(--bg-tertiary, #FAFAFA);
+  color: var(--text-primary, #1D1D1F);
+}
+
+.expandButton:active {
+  transform: scale(0.95);
+}
+
+/* Code info section */
+.codeInfo {
+  flex: 1;
+  min-width: 0;
 }
 
 .code {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--text-primary, #1D1D1F);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  
-  /* Better readability on touchscreens */
   letter-spacing: 0.02em;
+  line-height: 1.2;
 }
 
-.compact .code {
-  font-size: 16px;
+.timestamp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-secondary, #86868B);
+}
+
+.time {
+  color: var(--text-tertiary, #515154);
+  margin-left: 4px;
 }
 
 /* Status badge */
 .status {
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   color: white;
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  
-  /* Ensure minimum touch target */
-  min-height: 28px;
+  min-height: 24px;
   display: inline-flex;
   align-items: center;
 }
 
-/* Content area */
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 12px;
+/* Essential info section - Always visible */
+.essentialInfo {
+  padding: 0 20px 16px;
+  background: var(--bg-secondary, #FFFFFF);
 }
 
-/* Info rows */
-.infoRow {
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+}
+
+/* Expanded content */
+.expandedContent {
+  background: var(--bg-tertiary, #FAFAFA);
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-light, rgba(0, 0, 0, 0.1));
+  animation: slideDown 200ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.detailItem {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 24px; /* Touch-friendly height */
+  padding: 8px;
+  background: var(--bg-secondary, #FFFFFF);
+  border-radius: 6px;
+  min-height: 36px;
 }
 
+/* Icons */
 .icon {
   color: var(--text-secondary, #86868B);
   flex-shrink: 0;
 }
 
+/* Labels and values */
 .label {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary, #86868B);
   font-weight: 500;
-  min-width: 70px;
+  margin-right: 4px;
 }
 
 .value {
   font-size: 14px;
   color: var(--text-primary, #1D1D1F);
   font-weight: 400;
-  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Selection indicator */
+/* Selection indicator - Now in header */
 .selectionIndicator {
-  position: absolute;
-  top: 12px;
-  right: 12px;
   width: 32px;
   height: 32px;
 }
@@ -164,7 +246,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: white;
   transition: all 150ms ease;
@@ -182,6 +264,11 @@
   outline-offset: 2px;
 }
 
+.expandButton:focus-visible {
+  outline: 2px solid rgba(0, 113, 227, 0.4);
+  outline-offset: 1px;
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .boxCard {
@@ -191,24 +278,30 @@
   .status {
     border: 1px solid;
   }
+  
+  .expandedContent {
+    border-top-width: 2px;
+  }
 }
 
 /* Touch screen optimizations */
 @media (pointer: coarse) {
-  .boxCard {
-    padding: 24px;
-  }
-  
-  .compact {
+  .header {
     padding: 20px;
   }
   
-  .infoRow {
-    min-height: 32px;
+  .expandButton {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .infoItem,
+  .detailItem {
+    min-height: 44px;
   }
   
   .status {
-    min-height: 36px;
+    min-height: 32px;
     padding: 6px 16px;
   }
 }
@@ -222,5 +315,9 @@
   .label,
   .value {
     font-size: 13px;
+  }
+  
+  .detailsGrid {
+    grid-template-columns: 1fr;
   }
 }
