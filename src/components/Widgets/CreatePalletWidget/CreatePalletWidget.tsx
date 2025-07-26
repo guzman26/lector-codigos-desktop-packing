@@ -36,7 +36,7 @@ const CreatePalletWidget: React.FC = () => {
       </form>
       {loading && <p>Creating…</p>}
       {error && <p className={styles.error}>{error.message}</p>}
-      {data && <p className={styles.success}>Pallet #{data.code} created</p>}
+      {data && <p className={styles.success}>Pallet #{data.codigo} created</p>}
     </WidgetCard>
   );
 };

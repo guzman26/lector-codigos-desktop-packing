@@ -103,7 +103,7 @@ const CreatePalletForm: React.FC = () => {
 
         {data && (
           <Alert variant="success">
-            Pallet #{data.code} creado exitosamente
+            Pallet #{data.codigo} creado exitosamente
           </Alert>
         )}
 

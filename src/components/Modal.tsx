@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useCallback, useRef } from 'react';
+import React, { type ReactNode, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -196,15 +196,14 @@ const Modal: React.FC<ModalProps> = ({
     WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
   };
 
-  // Responsive adjustments for mobile
-  const mobileStyles: React.CSSProperties = {
-    '@media (max-width: 640px)': {
-      padding: theme.spacing.md,
-      borderRadius: `${theme.borderRadius.xl} ${theme.borderRadius.xl} 0 0`,
-      maxHeight: '95vh',
-      marginTop: 'auto',
-    }
-  };
+  // Mobile-specific styles (applied conditionally)
+  const isMobile = window.innerWidth <= 640;
+  const mobileStyles: React.CSSProperties = isMobile ? {
+    padding: theme.spacing.md,
+    borderRadius: `${theme.borderRadius.xl} ${theme.borderRadius.xl} 0 0`,
+    maxHeight: '95vh',
+    marginTop: 'auto',
+  } : {};
 
   return createPortal(
     <AnimatePresence>

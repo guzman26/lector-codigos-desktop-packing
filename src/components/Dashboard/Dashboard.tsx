@@ -7,7 +7,6 @@ import ActivePalletsWidget from '../Widgets/ActivePalletsWidget/ActivePalletsWid
 import SystemInfoWidget from '../Widgets/SystemInfoWidget/SystemInfoWidget';
 import IssueReporterWidget from '../Widgets/IssueReporterWidget/IssueReporterWidget';
 import CreateBoxWidget from '../Widgets/CreateBoxWidget/CreateBoxWidget';
-import BoxDetailsWidget from '../Widgets/BoxDetailsWidget/BoxDetailsWidget';
 import UnassignedBoxesWidget from '../Widgets/UnassignedBoxesWidget/UnassignedBoxesWidget';
 import CreatePalletWidget from '../Widgets/CreatePalletWidget/CreatePalletWidget';
 

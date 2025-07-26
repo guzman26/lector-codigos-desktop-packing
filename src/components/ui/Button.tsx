@@ -92,7 +92,7 @@ export const Button: React.FC<ButtonProps> = ({
     onDragEnd, 
     onDragStart,
     onAnimationStart,
-    ...safeProps 
+    ...safeProps
   } = props;
 
   return (
@@ -111,6 +111,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled}
       className={className}
       onClick={onClick}
+      {...safeProps}
     >
       {icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
       {children}

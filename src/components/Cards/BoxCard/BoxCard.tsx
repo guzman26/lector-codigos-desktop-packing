@@ -1,6 +1,5 @@
 import React, { memo, useState } from 'react';
 import type { UnassignedBox } from '../../../types';
-import { theme } from '../../../styles/theme';
 import styles from './BoxCard.module.css';
 import { Package, Calendar, Ruler, User, MapPin, Hash, ChevronDown, ChevronRight, Clock, BarChart, Plus, ArrowRight } from 'lucide-react';
 import { useCreateSingleBoxPallet } from '../../../hooks/useCreateSingleBoxPallet';

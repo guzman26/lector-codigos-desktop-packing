@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPallet } from '../services/palletService';
-import type { Pallet } from '../services/palletService';
+import type { Pallet } from '../types';
 
 export const useCreatePallet = () => {
   const [data, setData] = useState<Pallet | null>(null);
