@@ -2,10 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useUnassignedBoxesInPacking } from '../../../hooks/useUnassignedBoxesInPacking';
 import { BoxCard } from '../../Cards';
 import WidgetCard from '../WidgetCard';
-import Modal from '../../Modal';
-import { theme } from '../../../styles/theme';
+import Modal from '../../ui/Modal';
 import { Package, AlertTriangle, Search, Filter, ArrowUp, ArrowDown, Calendar, Ruler, User } from 'lucide-react';
-import type { UnassignedBox } from '../../../types';
 
 /**
  * UnassignedBoxesWidget - macOS-styled with enhanced UX

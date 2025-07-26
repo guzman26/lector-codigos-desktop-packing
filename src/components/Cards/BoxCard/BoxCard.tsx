@@ -5,6 +5,7 @@ import styles from './BoxCard.module.css';
 import { Package, Calendar, Ruler, User, MapPin, Hash, ChevronDown, ChevronRight, Clock, BarChart, Plus, ArrowRight } from 'lucide-react';
 import { useCreateSingleBoxPallet } from '../../../hooks/useCreateSingleBoxPallet';
 import { useAssignBoxToCompatiblePallet } from '../../../hooks/useAssignBoxToCompatiblePallet';
+import { Button } from '../../ui/Button';
 
 interface BoxCardProps {
   box: UnassignedBox;
@@ -484,63 +485,27 @@ export const BoxCard = memo<BoxCardProps>(({
             gap: '6px',
             flexWrap: 'wrap',
           }}>
-            <button
-              className={`${styles.actionButton} action-button`}
+            <Button
               onClick={handleCreateSinglePallet}
               disabled={createSinglePallet.loading}
-              style={{
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: '600',
-                cursor: createSinglePallet.loading ? 'not-allowed' : 'pointer',
-                opacity: createSinglePallet.loading ? 0.6 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                transition: 'all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1)',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                flex: 1,
-                minWidth: '120px',
-                justifyContent: 'center',
-              }}
+              size="small"
+              variant="primary"
               title="Crear Pallet Individual"
             >
               <Plus size={12} />
               {createSinglePallet.loading ? 'Creando...' : 'Crear Pallet'}
-            </button>
+            </Button>
 
-            <button
-              className={`${styles.actionButton} action-button`}
+            <Button
               onClick={handleAssignToCompatible}
               disabled={assignToCompatible.loading}
-              style={{
-                background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: '600',
-                cursor: assignToCompatible.loading ? 'not-allowed' : 'pointer',
-                opacity: assignToCompatible.loading ? 0.6 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                transition: 'all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1)',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                flex: 1,
-                minWidth: '120px',
-                justifyContent: 'center',
-              }}
+              size="small"
+              variant="primary"
               title="Asignar a Pallet Compatible"
             >
               <ArrowRight size={12} />
               {assignToCompatible.loading ? 'Asignando...' : 'Asignar a Pallet'}
-            </button>
+            </Button>
           </div>
 
           {/* Status messages - More compact */}

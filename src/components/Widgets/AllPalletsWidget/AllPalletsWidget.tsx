@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useAllPallets } from '../../../hooks/useAllPallets';
 import { PalletCard } from '../../Cards';
 import WidgetCard from '../WidgetCard';
-import Modal from '../../Modal';
+import Modal from '../../ui/Modal';
 import { theme } from '../../../styles/theme';
 import { Package2, AlertCircle, Search, Filter } from 'lucide-react';
 import type { Pallet } from '../../../types';

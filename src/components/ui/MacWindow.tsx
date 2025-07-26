@@ -8,6 +8,7 @@ interface MacWindowProps {
   height?: number | string;
   resizable?: boolean;
   footer?: React.ReactNode;
+  onClose?: () => void;
 }
 
 export const MacWindow: React.FC<MacWindowProps> = ({
@@ -17,6 +18,7 @@ export const MacWindow: React.FC<MacWindowProps> = ({
   height = 400,
   resizable = false,
   footer,
+  onClose,
 }) => {
   const containerStyles: React.CSSProperties = {
     width,
@@ -46,6 +48,7 @@ export const MacWindow: React.FC<MacWindowProps> = ({
     height: 12,
     borderRadius: '50%',
     backgroundColor: color,
+    cursor: 'pointer',
   });
 
   const contentStyles: React.CSSProperties = {
@@ -64,7 +67,7 @@ export const MacWindow: React.FC<MacWindowProps> = ({
     <div style={containerStyles}>
       <div style={titleBarStyles}>
         <div style={{ display: 'flex', gap: '6px' }}>
-          <span style={trafficButtonStyles('#FF5F56')} />
+          <span style={trafficButtonStyles('#FF5F56')} onClick={onClose} />
           <span style={trafficButtonStyles('#FFBD2E')} />
           <span style={trafficButtonStyles('#27C93F')} />
         </div>

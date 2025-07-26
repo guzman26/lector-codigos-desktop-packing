@@ -4,8 +4,10 @@ import CreatePalletForm from '../../components/Forms/CreatePalletForm';
 import { Container, Button, MacWindow } from '../../components/ui';
 import { ArrowLeft } from 'lucide-react';
 import { theme } from '../../styles/theme';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePallet: React.FC = () => {
+  const navigate = useNavigate();
   const pageStyles: React.CSSProperties = {
     minHeight: '100vh',
     backgroundColor: theme.colors.background.primary,
@@ -57,6 +59,7 @@ const CreatePallet: React.FC = () => {
           width="100%"
           height="auto"
           resizable={false}
+          onClose={() => navigate('/')}
         >
           <CreatePalletForm />
         </MacWindow>
