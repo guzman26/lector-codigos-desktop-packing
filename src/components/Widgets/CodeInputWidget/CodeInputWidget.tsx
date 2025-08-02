@@ -14,13 +14,14 @@ export interface CodeInputWidgetProps {
 }
 
 /**
- * Widget for code input with automatic capture capability.
- * Allows users to manually input codes or toggle automatic capture from scanners.
+ * Widget for code input with automatic submission capability.
+ * Automatically submits codes when they reach 16 or 126 digits.
+ * Toggle controls global key capture from anywhere on the page.
  */
 const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, onProcessCode }) => {
   const { latestCode, history } = data;
   const [inputValue, setInputValue] = useState('');
-  const [captureEnabled, setCaptureEnabled] = useState(false);
+  const [captureEnabled, setCaptureEnabled] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasError, setHasError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,9 +115,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   };
 
   // Auto-envío cuando el código alcanza 16 dígitos (cajas) o 126 dígitos (otros códigos)
+  // Siempre activo, independientemente del estado del toggle
   useEffect(() => {
-    if (!captureEnabled) return;
-    
     // Limpiar timeout anterior
     if (autoSubmitTimeoutRef.current) {
       clearTimeout(autoSubmitTimeoutRef.current);
@@ -139,7 +139,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         autoSubmitTimeoutRef.current = null;
       }
     };
-  }, [inputValue.length, isProcessing, handleSubmit, captureEnabled]);
+  }, [inputValue.length, isProcessing, handleSubmit]);
 
   // Listener global para Enter - envía el código desde cualquier parte de la página
   useEffect(() => {
@@ -280,7 +280,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder={captureEnabled ? "Captura automática activada - escanee código..." : "Escanee o ingrese código..."}
+          placeholder="Escanee código (envío automático a 16/126 dígitos)..."
           style={{
             ...inputStyles,
             borderColor: hasError ? '#FF3B30' : theme.colors.border.light
@@ -300,11 +300,11 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         </Button>
       </div>
       
-      {/* Automatic capture toggle */}
+      {/* Global capture toggle - controls whether keys are captured from anywhere on the page */}
       <div style={toggleContainerStyles}>
         <span style={toggleLabelStyles}>
           <ScanLine size={24} color={captureEnabled ? theme.colors.accent.blue : theme.colors.text.primary} />
-          Captura automática
+          Captura global
         </span>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: theme.spacing.xs }}>
           <ToggleSwitch
