@@ -26,8 +26,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasError, setHasError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const processingTimeoutRef = useRef<number | null>(null);
+  const autoSubmitTimeoutRef = useRef<number | null>(null);
   
   // Enfoca el input al montar el componente y cuando se activa la captura automática
   useEffect(() => {
@@ -59,7 +59,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     
     // Limpiar cualquier timeout pendiente
     if (processingTimeoutRef.current) {
-      clearTimeout(processingTimeoutRef.current);
+      window.clearTimeout(processingTimeoutRef.current);
       processingTimeoutRef.current = null;
     }
     
@@ -84,7 +84,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       setHasError(true);
     } finally {
       // Usar un timeout mínimo para evitar conflictos con códigos rápidos
-      processingTimeoutRef.current = setTimeout(() => {
+      processingTimeoutRef.current = window.setTimeout(() => {
         setIsProcessing(false);
         
         // Re-enfocar el input después del envío para escaneo continuo
@@ -101,10 +101,10 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   useEffect(() => {
     return () => {
       if (processingTimeoutRef.current) {
-        clearTimeout(processingTimeoutRef.current);
+        window.clearTimeout(processingTimeoutRef.current);
       }
       if (autoSubmitTimeoutRef.current) {
-        clearTimeout(autoSubmitTimeoutRef.current);
+        window.clearTimeout(autoSubmitTimeoutRef.current);
       }
     };
   }, []);
@@ -120,7 +120,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   useEffect(() => {
     // Limpiar timeout anterior
     if (autoSubmitTimeoutRef.current) {
-      clearTimeout(autoSubmitTimeoutRef.current);
+      window.clearTimeout(autoSubmitTimeoutRef.current);
       autoSubmitTimeoutRef.current = null;
     }
     
@@ -128,7 +128,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     
     if (shouldAutoSubmit) {
       // Delay para asegurar que el scanner haya terminado
-      autoSubmitTimeoutRef.current = setTimeout(() => {
+      autoSubmitTimeoutRef.current = window.setTimeout(() => {
         handleSubmit();
         autoSubmitTimeoutRef.current = null;
       }, 150);
@@ -136,7 +136,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     
     return () => {
       if (autoSubmitTimeoutRef.current) {
-        clearTimeout(autoSubmitTimeoutRef.current);
+        window.clearTimeout(autoSubmitTimeoutRef.current);
         autoSubmitTimeoutRef.current = null;
       }
     };
