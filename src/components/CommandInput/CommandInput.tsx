@@ -74,9 +74,11 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     setShowHistory(false);
   }, [value, onSubmit]);
 
-  // Auto-envío cuando el código alcanza exactamente 126 dígitos
+  // Auto-envío cuando el código alcanza 16 dígitos (cajas) o 126 dígitos (otros códigos)
   useEffect(() => {
-    if (value.length === 126) {
+    const shouldAutoSubmit = value.length === 16 || value.length === 126;
+    
+    if (shouldAutoSubmit) {
       // Pequeño delay para asegurar que el scanner haya terminado
       const timer = setTimeout(() => {
         handleSubmit(new Event('submit') as any);

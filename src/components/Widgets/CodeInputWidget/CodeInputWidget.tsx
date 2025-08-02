@@ -72,9 +72,11 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     if (hasError) setHasError(false);
   };
 
-  // Auto-envío cuando el código alcanza exactamente 126 dígitos
+  // Auto-envío cuando el código alcanza 16 dígitos (cajas) o 126 dígitos (otros códigos)
   useEffect(() => {
-    if (inputValue.length === 126 && !isProcessing) {
+    const shouldAutoSubmit = (inputValue.length === 16 || inputValue.length === 126) && !isProcessing;
+    
+    if (shouldAutoSubmit) {
       // Pequeño delay para asegurar que el scanner haya terminado
       const timer = setTimeout(() => {
         handleSubmit();
@@ -82,6 +84,28 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       return () => clearTimeout(timer);
     }
   }, [inputValue.length, isProcessing, handleSubmit]);
+
+  // Listener global para Enter - envía el código desde cualquier parte de la página
+  useEffect(() => {
+    const handleGlobalEnter = (e: KeyboardEvent) => {
+      // Solo procesar si hay contenido y no estamos procesando
+      if (e.key === 'Enter' && inputValue.trim() && !isProcessing) {
+        // Verificar que no estemos en inputs que manejan modales o formularios críticos
+        const target = e.target as HTMLElement;
+        const isInModal = target.closest('[role="dialog"]') !== null;
+        const isInSearchInput = target.closest('[data-search-input]') !== null;
+        
+        // Solo interceptar Enter si no estamos en un modal o input de búsqueda crítico
+        if (!isInModal && !isInSearchInput) {
+          e.preventDefault();
+          handleSubmit();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalEnter);
+    return () => document.removeEventListener('keydown', handleGlobalEnter);
+  }, [inputValue, isProcessing, handleSubmit]);
   
   // Manejador de teclas en el campo de entrada
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
