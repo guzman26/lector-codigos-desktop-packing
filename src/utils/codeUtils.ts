@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { CALIBRE_OPTIONS } from './options';
 
 /**
  * Generates a 10-digit pallet base code.
@@ -23,4 +24,16 @@ export const generatePalletCode = (
   const year  = format(date, 'yy'); // last two digits
 
   return `${day}${week}${year}${shift}${caliber}${formatId}${company}`;
+};
+
+/**
+ * Converts a 2-digit calibre code to its human-readable text
+ * @param calibreCode - The 2-digit calibre code (e.g., "01", "02", etc.)
+ * @returns The human-readable calibre text or the original code if not found
+ */
+export const getCalibreText = (calibreCode: string): string => {
+  if (!calibreCode) return '';
+  
+  const calibreOption = CALIBRE_OPTIONS.find(option => option.value === calibreCode);
+  return calibreOption ? calibreOption.label : calibreCode;
 }; 

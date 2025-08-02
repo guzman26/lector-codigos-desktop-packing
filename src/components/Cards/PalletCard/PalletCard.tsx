@@ -3,6 +3,7 @@ import type { Pallet } from '../../../types';
 import { theme } from '../../../styles/theme';
 import styles from './PalletCard.module.css';
 import { Package2, Calendar, MapPin, Boxes, AlertCircle, Clock, Activity, Ruler } from 'lucide-react';
+import { getCalibreText } from '../../../utils/codeUtils';
 
 interface PalletCardProps {
   pallet: Pallet;
@@ -188,7 +189,7 @@ export const PalletCard = memo<PalletCardProps>(({
               <Ruler size={variant === 'compact' ? 14 : 16} className={styles.icon} />
               <span className={styles.label}>Calibre:</span>
             </div>
-            <span className={styles.value}>{pallet.fechaCalibreFormato}</span>
+            <span className={styles.value}>{getCalibreText(pallet.fechaCalibreFormato)}</span>
           </div>
         )}
 

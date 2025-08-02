@@ -6,6 +6,7 @@ interface MacWindowProps {
   children: React.ReactNode;
   width?: number | string;
   height?: number | string;
+  minHeight?: number | string;
   resizable?: boolean;
   footer?: React.ReactNode;
   onClose?: () => void;
@@ -16,6 +17,7 @@ export const MacWindow: React.FC<MacWindowProps> = ({
   children,
   width = 600,
   height = 400,
+  minHeight,
   resizable = false,
   footer,
   onClose,
@@ -23,6 +25,7 @@ export const MacWindow: React.FC<MacWindowProps> = ({
   const containerStyles: React.CSSProperties = {
     width,
     height,
+    minHeight,
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: theme.colors.background.secondary,

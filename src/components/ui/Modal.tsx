@@ -10,7 +10,7 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  size?: 'small' | 'medium' | 'large' | 'fullscreen';
+  size?: 'small' | 'medium' | 'large' | 'xl' | 'fullscreen';
   closeOnBackdropClick?: boolean;
   closeOnEscapeKey?: boolean;
   resizable?: boolean;
@@ -23,10 +23,25 @@ function getPixelWidth(size: ModalProps['size']): number | string {
       return 400;
     case 'large':
       return 1200;
+    case 'xl':
+      return 1600;
     case 'fullscreen':
       return '100%';
     default:
       return 800; // medium
+  }
+}
+
+function getMinHeight(size: ModalProps['size']): string | undefined {
+  switch (size) {
+    case 'large':
+      return '70vh';
+    case 'xl':
+      return '80vh';
+    case 'fullscreen':
+      return '100%';
+    default:
+      return undefined;
   }
 }
 
@@ -131,6 +146,7 @@ const Modal: React.FC<ModalProps> = ({
                 title={title}
                 width={getPixelWidth(size)}
                 height={size === 'fullscreen' ? '100%' : undefined}
+                minHeight={getMinHeight(size)}
                 resizable={resizable}
                 onClose={onClose}
               >

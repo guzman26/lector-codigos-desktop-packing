@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button, ToggleSwitch } from '../ui';
 import { Play, ScanLine, History, Terminal } from 'lucide-react';
 import { theme } from '../../styles/theme';
@@ -62,7 +62,7 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     return () => window.removeEventListener('keydown', handleExternalInput);
   }, [captureEnabled, value, autoSubmit]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (!value.trim()) return;
     
@@ -72,7 +72,18 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     setValue('');
     setHistoryIndex(-1);
     setShowHistory(false);
-  };
+  }, [value, onSubmit]);
+
+  // Auto-envío cuando el código alcanza exactamente 126 dígitos
+  useEffect(() => {
+    if (value.length === 126) {
+      // Pequeño delay para asegurar que el scanner haya terminado
+      const timer = setTimeout(() => {
+        handleSubmit(new Event('submit') as any);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [value.length, handleSubmit]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowUp') {

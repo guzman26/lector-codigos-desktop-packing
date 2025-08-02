@@ -5,6 +5,7 @@ import { Package, Calendar, Ruler, User, MapPin, Hash, ChevronDown, ChevronRight
 import { useCreateSingleBoxPallet } from '../../../hooks/useCreateSingleBoxPallet';
 import { useAssignBoxToCompatiblePallet } from '../../../hooks/useAssignBoxToCompatiblePallet';
 import { Button } from '../../ui/Button';
+import { getCalibreText } from '../../../utils/codeUtils';
 
 interface BoxCardProps {
   box: UnassignedBox;
@@ -186,7 +187,7 @@ export const BoxCard = memo<BoxCardProps>(({
                 fontWeight: '600',
                 fontSize: '9px',
               }}>
-                {box.calibre}
+                {getCalibreText(box.calibre)}
               </span>
             )}
             
@@ -348,7 +349,7 @@ export const BoxCard = memo<BoxCardProps>(({
             borderRadius: '4px',
           }}>
             <Ruler size={11} color="#3B82F6" />
-            <span style={{ color: '#3B82F6', fontSize: '11px', fontWeight: '600' }}>{box.calibre}</span>
+            <span style={{ color: '#3B82F6', fontSize: '11px', fontWeight: '600' }}>{getCalibreText(box.calibre)}</span>
           </div>
         )}
 
