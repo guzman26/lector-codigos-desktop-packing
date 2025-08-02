@@ -24,18 +24,42 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasError, setHasError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Enfoca el input al montar el componente
+  // Enfoca el input al montar el componente y cuando se activa la captura automática
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
   
+  // Mantener el input enfocado cuando la captura automática está activada
+  useEffect(() => {
+    if (captureEnabled && inputRef.current) {
+      inputRef.current.focus();
+      
+      // Verificar periodicamente que el input sigue enfocado
+      const focusInterval = setInterval(() => {
+        if (captureEnabled && inputRef.current && document.activeElement !== inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 500);
+      
+      return () => clearInterval(focusInterval);
+    }
+  }, [captureEnabled]);
+  
   // Manejador de envío del formulario
   const handleSubmit = useCallback(async () => {
     const trimmedCode = inputValue.trim();
     if (!trimmedCode || isProcessing) return;
+    
+    // Limpiar cualquier timeout pendiente
+    if (processingTimeoutRef.current) {
+      clearTimeout(processingTimeoutRef.current);
+      processingTimeoutRef.current = null;
+    }
     
     setIsProcessing(true);
     
@@ -57,14 +81,31 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       console.error('Error al procesar código:', error);
       setHasError(true);
     } finally {
-      setIsProcessing(false);
-      
-      // Re-enfocar el input después del envío para escaneo continuo
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
+      // Usar un timeout mínimo para evitar conflictos con códigos rápidos
+      processingTimeoutRef.current = setTimeout(() => {
+        setIsProcessing(false);
+        
+        // Re-enfocar el input después del envío para escaneo continuo
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+        
+        processingTimeoutRef.current = null;
+      }, 200);
     }
   }, [inputValue, isProcessing, onProcessCode, onCodeSubmit]);
+  
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current);
+      }
+      if (autoSubmitTimeoutRef.current) {
+        clearTimeout(autoSubmitTimeoutRef.current);
+      }
+    };
+  }, []);
   
   // Manejador de cambios en el input manual
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,16 +115,31 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
 
   // Auto-envío cuando el código alcanza 16 dígitos (cajas) o 126 dígitos (otros códigos)
   useEffect(() => {
+    if (!captureEnabled) return;
+    
+    // Limpiar timeout anterior
+    if (autoSubmitTimeoutRef.current) {
+      clearTimeout(autoSubmitTimeoutRef.current);
+      autoSubmitTimeoutRef.current = null;
+    }
+    
     const shouldAutoSubmit = (inputValue.length === 16 || inputValue.length === 126) && !isProcessing;
     
     if (shouldAutoSubmit) {
-      // Pequeño delay para asegurar que el scanner haya terminado
-      const timer = setTimeout(() => {
+      // Delay para asegurar que el scanner haya terminado
+      autoSubmitTimeoutRef.current = setTimeout(() => {
         handleSubmit();
-      }, 100);
-      return () => clearTimeout(timer);
+        autoSubmitTimeoutRef.current = null;
+      }, 150);
     }
-  }, [inputValue.length, isProcessing, handleSubmit]);
+    
+    return () => {
+      if (autoSubmitTimeoutRef.current) {
+        clearTimeout(autoSubmitTimeoutRef.current);
+        autoSubmitTimeoutRef.current = null;
+      }
+    };
+  }, [inputValue.length, isProcessing, handleSubmit, captureEnabled]);
 
   // Listener global para Enter - envía el código desde cualquier parte de la página
   useEffect(() => {
@@ -119,23 +175,38 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     // Solo configurar el listener global si la captura está activada
     if (!captureEnabled) return;
     
-    // Función para manejar teclas cuando el input no está enfocado
-    const handleGlobalKeyPress = (e: KeyboardEvent) => {
-      // Si el input ya está enfocado, dejar que el manejo normal funcione
-      if (document.activeElement === inputRef.current) {
+    // Función para manejar teclas cuando el input no está enfocado o para capturar input global
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Ignorar teclas de modificación, funciones, etc.
+      if (e.ctrlKey || e.metaKey || e.altKey || e.key.length > 1) {
         return;
       }
       
-      // Manejar caracteres alfanuméricos y símbolos comunes de escáner
-      if (/^[a-zA-Z0-9\-_]$/.test(e.key)) {
-        // Enfocar el input y agregar el carácter
-        if (inputRef.current) {
+      // Si estamos procesando, ignorar nuevas entradas
+      if (isProcessing) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Expandir el patrón para incluir más caracteres que los escáneres pueden enviar
+      // Incluir números, letras, guiones, guiones bajos, puntos, espacios, y otros símbolos comunes
+      if (/^[a-zA-Z0-9\-_\.\s\+\=\/\\\|]$/.test(e.key)) {
+        // Asegurar que el input esté enfocado
+        if (inputRef.current && document.activeElement !== inputRef.current) {
           inputRef.current.focus();
-          // En lugar de modificar el estado directamente, simular entrada de teclado
-          // insertando el carácter en el campo de texto enfocado
+        }
+        
+        // Si el input no está enfocado, capturar la tecla y agregarla manualmente
+        if (document.activeElement !== inputRef.current && inputRef.current) {
+          e.preventDefault();
+          
+          // Usar el valor actual del input desde el DOM para evitar problemas de estado stale
+          const currentValue = inputRef.current.value || '';
+          const newValue = currentValue + e.key;
+          
+          // Actualizar el valor directamente y disparar evento
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
           if (nativeInputValueSetter) {
-            const newValue = inputValue + e.key;
             nativeInputValueSetter.call(inputRef.current, newValue);
             // Disparar un evento input para que React actualice su estado
             const inputEvent = new Event('input', { bubbles: true });
@@ -145,13 +216,13 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       }
     };
     
-    // Agregar listener global de teclado
-    window.addEventListener('keypress', handleGlobalKeyPress);
+    // Usar keydown en lugar de keypress para mejor captura de caracteres
+    document.addEventListener('keydown', handleGlobalKeyDown, true);
     
     return () => {
-      window.removeEventListener('keypress', handleGlobalKeyPress);
+      document.removeEventListener('keydown', handleGlobalKeyDown, true);
     };
-  }, [captureEnabled, inputValue]);
+  }, [captureEnabled, isProcessing]);
   
   const inputStyles: React.CSSProperties = {
     width: '100%',
@@ -209,7 +280,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Escanee o ingrese código..."
+          placeholder={captureEnabled ? "Captura automática activada - escanee código..." : "Escanee o ingrese código..."}
           style={{
             ...inputStyles,
             borderColor: hasError ? '#FF3B30' : theme.colors.border.light
