@@ -14,9 +14,10 @@ export interface CodeInputWidgetProps {
 }
 
 /**
- * Widget for code input with automatic submission capability.
+ * Widget for code input with automatic capture and submission.
+ * Input is always focused and ready to receive barcode scanner input.
  * Automatically submits codes when they reach 16 or 126 digits.
- * Toggle controls global key capture from anywhere on the page.
+ * Global key capture is always active for seamless barcode scanning.
  */
 const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, onProcessCode }) => {
   const { latestCode, history } = data;
@@ -35,21 +36,21 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     }
   }, []);
   
-  // Mantener el input enfocado cuando la captura automática está activada
+  // Mantener el input siempre enfocado para captura automática
   useEffect(() => {
-    if (captureEnabled && inputRef.current) {
+    if (inputRef.current) {
       inputRef.current.focus();
       
       // Verificar periodicamente que el input sigue enfocado
       const focusInterval = setInterval(() => {
-        if (captureEnabled && inputRef.current && document.activeElement !== inputRef.current) {
+        if (inputRef.current && document.activeElement !== inputRef.current) {
           inputRef.current.focus();
         }
       }, 500);
       
       return () => clearInterval(focusInterval);
     }
-  }, [captureEnabled]);
+  }, []);
   
   // Manejador de envío del formulario
   const handleSubmit = useCallback(async () => {
@@ -170,11 +171,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     }
   };
   
-  // Este efecto maneja la captura automática cuando está activada
+  // Este efecto maneja la captura automática global - siempre activa
   useEffect(() => {
-    // Solo configurar el listener global si la captura está activada
-    if (!captureEnabled) return;
-    
     // Función para manejar teclas cuando el input no está enfocado o para capturar input global
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       // Ignorar teclas de modificación, funciones, etc.
@@ -187,6 +185,9 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         e.preventDefault();
         return;
       }
+      
+      // Captura global siempre activa para escáneres automáticos
+      // El toggle ahora solo controla la visualización, no la funcionalidad
       
       // Expandir el patrón para incluir más caracteres que los escáneres pueden enviar
       // Incluir números, letras, guiones, guiones bajos, puntos, espacios, y otros símbolos comunes
@@ -222,7 +223,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     return () => {
       document.removeEventListener('keydown', handleGlobalKeyDown, true);
     };
-  }, [captureEnabled, isProcessing]);
+  }, [isProcessing]);
   
   const inputStyles: React.CSSProperties = {
     width: '100%',
@@ -280,7 +281,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Escanee código (envío automático a 16/126 dígitos)..."
+          placeholder="Siempre listo para escanear - envío automático a 16/126 dígitos"
           style={{
             ...inputStyles,
             borderColor: hasError ? '#FF3B30' : theme.colors.border.light
@@ -300,11 +301,11 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         </Button>
       </div>
       
-      {/* Global capture toggle - controls whether keys are captured from anywhere on the page */}
+      {/* Status indicator - capture is always active for barcode scanning */}
       <div style={toggleContainerStyles}>
         <span style={toggleLabelStyles}>
           <ScanLine size={24} color={captureEnabled ? theme.colors.accent.blue : theme.colors.text.primary} />
-          Captura global
+          Modo activo
         </span>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: theme.spacing.xs }}>
           <ToggleSwitch
