@@ -1,9 +1,36 @@
-export async function fetchJson<T>(
+export interface ApiMeta {
+  requestId?: string;
+  timestamp?: string;
+  // Allow unknown extras
+  [key: string]: unknown;
+}
+
+export interface ApiEnvelope<T = unknown> {
+  status: 'success' | 'fail' | 'error';
+  message?: string;
+  data?: T | null;
+  meta?: ApiMeta;
+}
+
+export class ApiError extends Error {
+  public readonly statusCode?: number;
+  public readonly status?: ApiEnvelope['status'];
+  public readonly meta?: ApiMeta;
+
+  constructor(message: string, options?: { statusCode?: number; status?: ApiEnvelope['status']; meta?: ApiMeta }) {
+    super(message);
+    this.name = 'ApiError';
+    this.statusCode = options?.statusCode;
+    this.status = options?.status;
+    this.meta = options?.meta;
+  }
+}
+
+export async function fetchJson<T = unknown>(
   url: string,
   options: RequestInit = {}
-): Promise<T> {
+): Promise<ApiEnvelope<T> | T> {
   const response = await fetch(url, {
-    // Provide sane defaults and allow overrides via options
     headers: {
       'Content-Type': 'application/json',
       ...(options.headers ?? {}),
@@ -11,11 +38,45 @@ export async function fetchJson<T>(
     ...options,
   });
 
-  if (!response.ok) {
-    // Attempt to read server error body for easier debugging
-    const errorBody = await response.text();
-    throw new Error(`Request failed ${response.status}: ${errorBody}`);
+  const statusCode = response.status;
+  const text = await response.text();
+
+  // Try to parse JSON when possible
+  let parsed: unknown;
+  try {
+    parsed = text ? JSON.parse(text) : {};
+  } catch {
+    parsed = text;
   }
 
-  return response.json() as Promise<T>;
+  // Non-2xx HTTP status → throw including body
+  if (!response.ok) {
+    // If server responded with our standardized envelope, surface message
+    if (parsed && typeof parsed === 'object' && 'status' in (parsed as any)) {
+      const env = parsed as ApiEnvelope<unknown>;
+      throw new ApiError(env.message || `Request failed ${statusCode}`, {
+        statusCode,
+        status: env.status,
+        meta: env.meta,
+      });
+    }
+    throw new ApiError(`Request failed ${statusCode}: ${typeof parsed === 'string' ? parsed : text}`, { statusCode });
+  }
+
+  // If response follows the standardized envelope, handle status
+  if (parsed && typeof parsed === 'object' && 'status' in (parsed as any)) {
+    const env = parsed as ApiEnvelope<T>;
+    if (env.status !== 'success') {
+      throw new ApiError(env.message || 'Unknown API error', {
+        statusCode,
+        status: env.status,
+        meta: env.meta,
+      });
+    }
+    // Return the full envelope so callers can access data/message/meta as needed
+    return env as ApiEnvelope<T>;
+  }
+
+  // Fallback: return raw parsed body (for non-standard endpoints)
+  return parsed as T;
 } 
