@@ -7,9 +7,19 @@ export interface IssueResponse {
   ticketId?: string;
 }
 
-
-export const postIssue = (issue: string) =>
-  fetchJson<IssueResponse>(`${API_BASE}/postIssue`, {
+export const postIssue = async (issue: string) => {
+  const res = await fetchJson<{ issueId?: string }>(`${API_BASE}/postIssue`, {
     method: 'POST',
     body: JSON.stringify({ descripcion: issue }),
-  }); 
+  });
+  if (res && typeof res === 'object' && 'status' in (res as any)) {
+    const env = res as any;
+    return {
+      success: true,
+      message: env.message ?? 'Issue reported successfully',
+      data: env.data,
+      ticketId: env.data?.issueId,
+    } as IssueResponse;
+  }
+  return res as unknown as IssueResponse;
+}; 
