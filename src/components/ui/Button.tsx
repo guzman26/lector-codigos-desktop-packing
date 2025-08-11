@@ -55,7 +55,7 @@ export const Button: React.FC<ButtonProps> = ({
       borderRadius: theme.borderRadius.lg,
       height: '44px',
     },
-  };
+  } as const;
 
   const variantStyles = {
     primary: {
@@ -78,22 +78,25 @@ export const Button: React.FC<ButtonProps> = ({
       color: theme.colors.text.inverse,
       boxShadow: theme.colors.shadow.small,
     },
-  };
+  } as const;
 
   const hoverStyles = {
     primary: { backgroundColor: theme.colors.accent.blueHover },
     secondary: { backgroundColor: theme.colors.background.tertiary },
     ghost: { backgroundColor: theme.colors.background.tertiary },
     danger: { backgroundColor: '#FF453A' },
-  };
+  } as const;
 
-  const { 
-    onDrag, 
-    onDragEnd, 
-    onDragStart,
-    onAnimationStart,
+  // Omit props that conflict with framer-motion's event types
+  const {
+    onDrag, // eslint-disable-line @typescript-eslint/no-unused-vars
+    onDragEnd, // eslint-disable-line @typescript-eslint/no-unused-vars
+    onDragStart, // eslint-disable-line @typescript-eslint/no-unused-vars
+    onAnimationStart, // eslint-disable-line @typescript-eslint/no-unused-vars
     ...safeProps
   } = props;
+  // Touch the omitted variables to satisfy strict linters as used values
+  void onDrag; void onDragEnd; void onDragStart; void onAnimationStart;
 
   return (
     <motion.button

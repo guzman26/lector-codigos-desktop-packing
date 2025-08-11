@@ -3,8 +3,13 @@ import WidgetCard from '../WidgetCard';
 import { ProgressBar, ToggleSwitch } from '../../ui';
 import { theme } from '../../../styles/theme';
 
+interface SystemInfoData {
+  memory?: { used?: number; total?: number };
+  [key: string]: unknown;
+}
+
 interface SystemInfoWidgetProps {
-  data: any;
+  data: SystemInfoData;
 }
 
 const SystemInfoWidget: React.FC<SystemInfoWidgetProps> = ({ data }) => {

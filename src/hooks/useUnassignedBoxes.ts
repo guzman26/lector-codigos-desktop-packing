@@ -11,8 +11,8 @@ export const useUnassignedBoxes = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getUnassignedBoxes();
-      const extractedData = extractDataFromResponse(data);
+      const raw = await getUnassignedBoxes();
+      const extractedData = extractDataFromResponse<UnassignedBox>(raw);
       setData(extractedData);
       setError(null);
     } catch (err) {
@@ -24,7 +24,7 @@ export const useUnassignedBoxes = () => {
 
   useEffect(() => {
     load();
-  }, [load]);
+    }, [load]);
 
   return { data, loading, error, refresh: load };
 }; 

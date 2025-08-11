@@ -11,8 +11,8 @@ export const useActivePallets = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchActivePallets();
-      const extractedData = extractDataFromResponse(data);
+      const raw = await fetchActivePallets();
+      const extractedData = extractDataFromResponse<Pallet>(raw);
       setData(extractedData);
       setError(null);
     } catch (err) {
@@ -24,8 +24,6 @@ export const useActivePallets = () => {
   useEffect(() => {
     load();
   }, [load]);
-
-  
 
   return { data, loading, error, refresh: load };
 }; 

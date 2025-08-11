@@ -11,8 +11,8 @@ export const useUnassignedBoxesInPacking = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getUnassignedBoxesInPacking();
-      const extractedData = extractDataFromResponse(data);
+      const raw = await getUnassignedBoxesInPacking();
+      const extractedData = extractDataFromResponse<UnassignedBox>(raw);
       setData(extractedData);
       setError(null);
     } catch (err) {

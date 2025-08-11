@@ -191,7 +191,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       
       // Expandir el patrón para incluir más caracteres que los escáneres pueden enviar
       // Incluir números, letras, guiones, guiones bajos, puntos, espacios, y otros símbolos comunes
-      if (/^[a-zA-Z0-9\-_\.\s\+\=\/\\\|]$/.test(e.key)) {
+      if (/^[a-zA-Z0-9-_. +=/\\|]$/.test(e.key)) {
         // Asegurar que el input esté enfocado
         if (inputRef.current && document.activeElement !== inputRef.current) {
           inputRef.current.focus();

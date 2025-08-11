@@ -14,6 +14,10 @@ const CreateBoxWidget: React.FC = () => {
     setCode('');
   };
 
+  const createdCode = (data && typeof data === 'object' && 'code' in data)
+    ? String((data as { code: unknown }).code)
+    : '';
+
   return (
     <WidgetCard title="Create Box">
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -33,7 +37,7 @@ const CreateBoxWidget: React.FC = () => {
       </form>
       {loading && <p>Creating…</p>}
       {error && <p className={styles.error}>{error.message}</p>}
-      {data && <p className={styles.success}>Created: {data.code}</p>}
+      {createdCode && <p className={styles.success}>Created: {createdCode}</p>}
     </WidgetCard>
   );
 };

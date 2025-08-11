@@ -1,4 +1,4 @@
-import { fetchJson } from './fetchJson';
+import { fetchJson, isApiEnvelope } from './fetchJson';
 import { API_BASE } from './index';
 import type { Pallet, UnassignedBox } from '../types';
 
@@ -6,26 +6,46 @@ import type { Pallet, UnassignedBox } from '../types';
  * Domain models – keep them minimal; extend as backend evolves.
  */
 
-export const fetchActivePallets = () =>
-  fetchJson<Pallet[]>(`${API_BASE}/getActivePallets`);
+export const fetchActivePallets = async (): Promise<Pallet[]> => {
+  const res = await fetchJson<{ pallets?: Pallet[]; items?: Pallet[] }>(`${API_BASE}/getActivePallets`);
+  if (isApiEnvelope(res)) {
+    const data = res.data as { pallets?: Pallet[]; items?: Pallet[] } | null | undefined;
+    return (data?.pallets ?? data?.items ?? []) as Pallet[];
+  }
+  return (res as unknown as Pallet[]) || [];
+};
 
-export const fetchAllPallets = () =>
-  fetchJson<Pallet[]>(`${API_BASE}/getPallets`);
+export const fetchAllPallets = async (): Promise<Pallet[]> => {
+  const res = await fetchJson<{ pallets?: Pallet[]; items?: Pallet[] }>(`${API_BASE}/getPallets`);
+  if (isApiEnvelope(res)) {
+    const data = res.data as { pallets?: Pallet[]; items?: Pallet[] } | null | undefined;
+    return (data?.pallets ?? data?.items ?? []) as Pallet[];
+  }
+  return (res as unknown as Pallet[]) || [];
+};
 
-export const getUnassignedBoxes = () =>
-  fetchJson<UnassignedBox[]>(`${API_BASE}/boxes/unassigned`);
+export const getUnassignedBoxes = async (): Promise<UnassignedBox[]> => {
+  const res = await fetchJson<{ boxes?: UnassignedBox[]; items?: UnassignedBox[] }>(`${API_BASE}/getUnassignedBoxesByLocation?ubicacion=PACKING`);
+  if (isApiEnvelope(res)) {
+    const data = res.data as { boxes?: UnassignedBox[]; items?: UnassignedBox[] } | null | undefined;
+    return (data?.boxes ?? data?.items ?? []) as UnassignedBox[];
+  }
+  return (res as unknown as UnassignedBox[]) || [];
+};
 
 export const closePallet = (code: string) =>
-  fetchJson<void>(`${API_BASE}/pallets/${code}/close`, { method: 'POST' });
+  fetchJson<void>(`${API_BASE}/closePallet`, { method: 'POST', body: JSON.stringify({ codigo: code }) });
 
 export const deleteBox = (code: string) =>
-  fetchJson<{ success: boolean }>(`${API_BASE}/boxes/${code}`, {
-    method: 'DELETE',
+  fetchJson<{ success: boolean }>(`${API_BASE}/admin/deleteBox`, {
+    method: 'POST',
+    body: JSON.stringify({ codigo: code }),
   });
 
 export const deletePallet = (code: string) =>
-  fetchJson<{ success: boolean }>(`${API_BASE}/pallets/${code}`, {
-    method: 'DELETE',
+  fetchJson<{ success: boolean }>(`${API_BASE}/admin/deletePallet`, {
+    method: 'POST',
+    body: JSON.stringify({ codigo: code }),
   });
 
 // ----------------- NEW: Create Pallet -----------------
@@ -33,8 +53,14 @@ export const deletePallet = (code: string) =>
  * Creates a pallet based on a 10-digit base code.
  * Example: 5272510211 → day 5, week 27, year 25, shift 1, caliber 02, format 1, empresa 1
  */
-export const createPallet = (codigo: string) =>
-  fetchJson<Pallet>(`${API_BASE}/createPallet`, {
+export const createPallet = async (codigo: string): Promise<Pallet> => {
+  const res = await fetchJson<{ pallet?: Pallet }>(`${API_BASE}/createPallet`, {
     method: 'POST',
     body: JSON.stringify({ codigo }),
-  }); 
+  });
+  if (isApiEnvelope<Pallet | { pallet?: Pallet }>(res)) {
+    const data = res.data as Pallet | { pallet?: Pallet } | null | undefined;
+    return ((data as { pallet?: Pallet })?.pallet ?? data) as Pallet;
+  }
+  return res as unknown as Pallet;
+};

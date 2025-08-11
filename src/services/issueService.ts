@@ -1,4 +1,4 @@
-import { fetchJson } from './fetchJson';
+import { fetchJson, isApiEnvelope } from './fetchJson';
 import { API_BASE } from './index';
 export interface IssueResponse {
   success: boolean;
@@ -7,9 +7,20 @@ export interface IssueResponse {
   ticketId?: string;
 }
 
+interface PostIssueData { issueId?: string }
 
-export const postIssue = (issue: string) =>
-  fetchJson<IssueResponse>(`${API_BASE}/postIssue`, {
+export const postIssue = async (issue: string) => {
+  const res = await fetchJson<PostIssueData>(`${API_BASE}/postIssue`, {
     method: 'POST',
     body: JSON.stringify({ descripcion: issue }),
-  }); 
+  });
+  if (isApiEnvelope<PostIssueData>(res)) {
+    return {
+      success: true,
+      message: res.message ?? 'Issue reported successfully',
+      data: res.data,
+      ticketId: res.data?.issueId,
+    } as IssueResponse;
+  }
+  return res as unknown as IssueResponse;
+};

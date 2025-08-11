@@ -11,8 +11,8 @@ export const useAllPallets = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchAllPallets();
-      const extractedData = extractDataFromResponse(data);
+      const raw = await fetchAllPallets();
+      const extractedData = extractDataFromResponse<Pallet>(raw);
       setData(extractedData);
       setError(null);
     } catch (err) {

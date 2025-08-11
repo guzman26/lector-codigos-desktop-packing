@@ -38,6 +38,17 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     }
   }, [captureEnabled]);
   
+  // Submit action wrapped (no need to pass event)
+  const performSubmit = useCallback(() => {
+    if (!value.trim()) return;
+    const trimmedValue = value.trim();
+    setHistory((prev) => [trimmedValue, ...prev.filter(h => h !== trimmedValue).slice(0, 9)]);
+    onSubmit(trimmedValue);
+    setValue('');
+    setHistoryIndex(-1);
+    setShowHistory(false);
+  }, [value, onSubmit]);
+
   // Handle machine input capture
   useEffect(() => {
     if (!captureEnabled) return;
@@ -51,7 +62,7 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
             setValue(prev => prev + event.key);
           } else if (event.key === 'Enter' && autoSubmit) {
             if (value.trim()) {
-              handleSubmit(new Event('submit') as any);
+              performSubmit();
             }
           }
         }
@@ -60,19 +71,12 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     
     window.addEventListener('keydown', handleExternalInput);
     return () => window.removeEventListener('keydown', handleExternalInput);
-  }, [captureEnabled, value, autoSubmit]);
+  }, [captureEnabled, value, autoSubmit, performSubmit]);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    if (!value.trim()) return;
-    
-    const trimmedValue = value.trim();
-    setHistory((prev) => [trimmedValue, ...prev.filter(h => h !== trimmedValue).slice(0, 9)]);
-    onSubmit(trimmedValue);
-    setValue('');
-    setHistoryIndex(-1);
-    setShowHistory(false);
-  }, [value, onSubmit]);
+    performSubmit();
+  }, [performSubmit]);
 
   // Auto-envío cuando el código alcanza 16 dígitos (cajas) o 126 dígitos (otros códigos)
   useEffect(() => {
@@ -81,11 +85,11 @@ const CommandInput: React.FC<CommandInputProps> = ({ onSubmit, lastResult }) => 
     if (shouldAutoSubmit) {
       // Pequeño delay para asegurar que el scanner haya terminado
       const timer = setTimeout(() => {
-        handleSubmit(new Event('submit') as any);
+        performSubmit();
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [value.length, handleSubmit]);
+  }, [value.length, performSubmit]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowUp') {
