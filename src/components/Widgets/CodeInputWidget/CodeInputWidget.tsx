@@ -11,7 +11,7 @@ export interface CodeInputWidgetProps {
     history: string[];
   };
   onCodeSubmit?: (code: string) => void;
-  onProcessCode?: (code: unknown) => Promise<void>;
+  onProcessCode?: (code: unknown) => Promise<{ ok: boolean; message?: string }>;
 }
 
 type HistoryEntry = { code: string; status: 'success' | 'fail' | 'error'; message: string };
@@ -71,9 +71,14 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     setIsProcessing(true);
     
     try {
+      let ok = true;
+      let msg: string | undefined;
+
       // Procesar el código con el servicio si está disponible
       if (onProcessCode) {
-        await onProcessCode(trimmedCode);
+        const result = await onProcessCode(trimmedCode);
+        ok = result.ok;
+        msg = result.message;
       }
       
       // Llamar al callback de envío si está disponible
@@ -81,15 +86,16 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         onCodeSubmit(trimmedCode);
       }
       
-      // Guardar en historial con estado success
+      // Guardar en historial con estado según resultado
+      const statusValue: HistoryEntry['status'] = ok ? 'success' : 'fail';
       setProcessedHistory((prev) => [
-        { code: trimmedCode, status: 'success' as const, message: 'Procesado correctamente' },
+        { code: trimmedCode, status: statusValue, message: ok ? 'Procesado correctamente' : (msg || 'Solicitud inválida') },
         ...prev
       ].slice(0, 10));
       
-      // Limpiar el input después de un envío exitoso
+      // Limpiar el input después
       setInputValue('');
-      setHasError(false);
+      setHasError(!ok);
     } catch (error) {
       const err = error as ApiError;
       const status: HistoryEntry['status'] = (err.status === 'fail' || err.status === 'error') ? err.status : 'error';
