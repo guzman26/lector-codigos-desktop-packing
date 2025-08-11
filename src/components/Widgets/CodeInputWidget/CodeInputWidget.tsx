@@ -3,6 +3,7 @@ import WidgetCard from '../WidgetCard';
 import { Button, ToggleSwitch } from '../../ui';
 import { ScanLine } from 'lucide-react';
 import { theme } from '../../../styles/theme';
+import { ApiError } from '../../../services/fetchJson';
 
 export interface CodeInputWidgetProps {
   data: {
@@ -13,6 +14,8 @@ export interface CodeInputWidgetProps {
   onProcessCode?: (code: unknown) => Promise<void>;
 }
 
+type HistoryEntry = { code: string; status: 'success' | 'fail' | 'error'; message: string };
+
 /**
  * Widget for code input with automatic capture and submission.
  * Input is always focused and ready to receive barcode scanner input.
@@ -20,7 +23,7 @@ export interface CodeInputWidgetProps {
  * Global key capture is always active for seamless barcode scanning.
  */
 const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, onProcessCode }) => {
-  const { latestCode, history } = data;
+  const { latestCode } = data;
   const [inputValue, setInputValue] = useState('');
   const [captureEnabled, setCaptureEnabled] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -28,6 +31,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   const inputRef = useRef<HTMLInputElement>(null);
   const processingTimeoutRef = useRef<number | null>(null);
   const autoSubmitTimeoutRef = useRef<number | null>(null);
+
+  const [processedHistory, setProcessedHistory] = useState<HistoryEntry[]>([]);
   
   // Enfoca el input al montar el componente y cuando se activa la captura automática
   useEffect(() => {
@@ -76,11 +81,23 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         onCodeSubmit(trimmedCode);
       }
       
+      // Guardar en historial con estado success
+      setProcessedHistory((prev) => [
+        { code: trimmedCode, status: 'success' as const, message: 'Procesado correctamente' },
+        ...prev
+      ].slice(0, 10));
+      
       // Limpiar el input después de un envío exitoso
       setInputValue('');
       setHasError(false);
     } catch (error) {
-      console.error('Error al procesar código:', error);
+      const err = error as ApiError;
+      const status: HistoryEntry['status'] = (err.status === 'fail' || err.status === 'error') ? err.status : 'error';
+      const message = err.message || 'Error al procesar';
+      setProcessedHistory((prev) => [
+        { code: trimmedCode, status, message } as HistoryEntry,
+        ...prev
+      ].slice(0, 10));
       setHasError(true);
     } finally {
       // Usar un timeout mínimo para evitar conflictos con códigos rápidos
@@ -271,6 +288,26 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     transition: 'color 0.2s ease',
   };
 
+  const badgeStyles: React.CSSProperties = {
+    padding: '2px 8px',
+    borderRadius: theme.borderRadius.full,
+    fontSize: theme.typography.fontSize.xs,
+    fontWeight: theme.typography.fontWeight.semibold,
+    lineHeight: 1.6,
+  };
+
+  const statusColor = (status: HistoryEntry['status']) => {
+    switch (status) {
+      case 'success':
+        return { backgroundColor: '#E6FFEA', color: '#0F5132', border: '1px solid #A3E6B1' };
+      case 'fail':
+        return { backgroundColor: '#FFF4E5', color: '#663C00', border: '1px solid #FFCC80' };
+      case 'error':
+      default:
+        return { backgroundColor: '#FEE2E2', color: '#7F1D1D', border: '1px solid #FCA5A5' };
+    }
+  };
+
   return (
     <WidgetCard title="Code Input">
       {/* Input field and submit button */}
@@ -326,7 +363,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         </div>
       </div>
       
-      {/* Display latest code and history */}
+      {/* Display latest code */}
       {latestCode && (
         <div>
           <div style={{ 
@@ -340,8 +377,9 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           }}>
             {latestCode}
           </div>
-          
-          {history.length > 0 && (
+
+          {/* Recent history with status and message */}
+          {processedHistory.length > 0 && (
             <div>
               <h4 style={{ 
                 fontSize: theme.typography.fontSize.sm,
@@ -355,15 +393,28 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
                 listStyle: 'none',
                 margin: 0,
                 padding: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: theme.spacing.xs,
               }}>
-                {history.map((code, idx) => (
-                  <li key={`${code}-${idx}`} style={{
-                    padding: `${theme.spacing.xs} 0`,
-                    borderBottom: idx !== history.length - 1 ? `1px solid ${theme.colors.border.light}` : 'none',
+                {processedHistory.map((entry, idx) => (
+                  <li key={`${entry.code}-${idx}`} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: theme.spacing.md,
+                    padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
+                    border: `1px solid ${theme.colors.border.light}`,
+                    borderRadius: theme.borderRadius.md,
+                    backgroundColor: theme.colors.background.tertiary,
                     fontSize: theme.typography.fontSize.sm,
                     fontFamily: theme.typography.fontFamily.mono,
                   }}>
-                    {code}
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.code}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.sm }}>
+                      <span style={{ ...badgeStyles, ...statusColor(entry.status) }}>{entry.status.toUpperCase()}</span>
+                      <span style={{ fontFamily: theme.typography.fontFamily.primary }}>{entry.message}</span>
+                    </span>
                   </li>
                 ))}
               </ul>
