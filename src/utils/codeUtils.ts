@@ -2,15 +2,15 @@ import { format } from 'date-fns';
 import { CALIBRE_OPTIONS } from './options';
 
 /**
- * Generates a 10-digit pallet base code.
- * Format: D WW YY S CC F E
+ * Generates an 11-digit pallet base code.
+ * Format: D WW YY S CC F EE
  *   D   Day of week (1-7)           – derived from date
  *   WW  ISO week of year (00-53)    – derived from date
  *   YY  last two digits of year     – derived from date
  *   S   shift (1 digit)             – passed in
  *   CC  calibre (2 digits)          – passed in
  *   F   format (1 digit)            – passed in
- *   E   company (1 digit)           – passed in
+ *   EE  company (2 digits)          – passed in
  */
 export const generatePalletCode = (
   date: Date,
@@ -23,7 +23,9 @@ export const generatePalletCode = (
   const week  = format(date, 'II'); // ISO week, zero-padded 2 digits
   const year  = format(date, 'yy'); // last two digits
 
-  return `${day}${week}${year}${shift}${caliber}${formatId}${company}`;
+  const companyTwoDigits = company.padStart(2, '0');
+
+  return `${day}${week}${year}${shift}${caliber}${formatId}${companyTwoDigits}`;
 };
 
 /**

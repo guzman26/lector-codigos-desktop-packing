@@ -50,8 +50,8 @@ export const deletePallet = (code: string) =>
 
 // ----------------- NEW: Create Pallet -----------------
 /**
- * Creates a pallet based on a 10-digit base code.
- * Example: 5272510211 → day 5, week 27, year 25, shift 1, caliber 02, format 1, empresa 1
+ * Creates a pallet based on an 11-digit base code (backend appends 3-digit suffix).
+ * Example base: 527251021101 → day 5, week 27, year 25, shift 1, calibre 02, formato 1, empresa 01
  */
 export const createPallet = async (codigo: string): Promise<Pallet> => {
   const res = await fetchJson<{ pallet?: Pallet }>(`${API_BASE}/createPallet`, {

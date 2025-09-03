@@ -26,6 +26,7 @@ const CreatePalletForm: React.FC = () => {
     if (!isValid) return;
 
     const codigo = generatePalletCode(createdAt, shift, caliber, formatId, company);
+    // codigo is the 11-digit base code; backend will append 3-digit suffix
     submit(codigo);
   };
 

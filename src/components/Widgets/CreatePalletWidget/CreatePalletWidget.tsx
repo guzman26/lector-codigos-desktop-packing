@@ -9,8 +9,8 @@ const CreatePalletWidget: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!/^\d{10}$/.test(codigo)) {
-      alert('Código must be exactly 10 digits');
+    if (!/^\d{11}$/.test(codigo)) {
+      alert('El código base debe tener exactamente 11 dígitos');
       return;
     }
     submit(codigo);
@@ -24,7 +24,7 @@ const CreatePalletWidget: React.FC = () => {
           className={styles.input}
           value={codigo}
           onChange={(e) => setCodigo(e.target.value)}
-          placeholder="10-digit código…"
+          placeholder="Código base de 11 dígitos…"
         />
         <button
           type="submit"

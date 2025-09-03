@@ -36,9 +36,9 @@ export const FORMATO_OPTIONS = [
 
 export const EMPRESA_OPTIONS = [
   { value: '', label: 'Seleccione una empresa' },
-  { value: '1', label: 'Lomas Altas' },
-  { value: '2', label: 'Santa Marta' },
-  { value: '3', label: 'Coliumo' },
-  { value: '4', label: 'El Monte' },
-  { value: '5', label: 'Libre' },
+  { value: '01', label: 'Lomas Altas' },
+  { value: '02', label: 'Santa Marta' },
+  { value: '03', label: 'Coliumo' },
+  { value: '04', label: 'El Monte' },
+  { value: '05', label: 'Libre' },
 ]; 
