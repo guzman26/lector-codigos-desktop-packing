@@ -70,28 +70,28 @@ const CreatePalletForm: React.FC = () => {
             label="Turno"
             value={shift}
             onChange={(e) => setShift(e.target.value)}
-            options={[{ value: '', label: 'Seleccionar turno' }, ...TURNO_OPTIONS]}
+            options={TURNO_OPTIONS}
             fullWidth
           />
           <Select
             label="Calibre"
             value={caliber}
             onChange={(e) => setCaliber(e.target.value)}
-            options={[{ value: '', label: 'Seleccionar calibre' }, ...CALIBRE_OPTIONS]}
+            options={CALIBRE_OPTIONS}
             fullWidth
           />
           <Select
             label="Formato"
             value={formatId}
             onChange={(e) => setFormatId(e.target.value)}
-            options={[{ value: '', label: 'Seleccionar formato' }, ...FORMATO_OPTIONS]}
+            options={FORMATO_OPTIONS}
             fullWidth
           />
           <Select
             label="Empresa"
             value={company}
             onChange={(e) => setCompany(e.target.value)}
-            options={[{ value: '', label: 'Seleccionar empresa' }, ...EMPRESA_OPTIONS]}
+            options={EMPRESA_OPTIONS}
             fullWidth
           />
         </div>
