@@ -18,9 +18,9 @@ type HistoryEntry = { code: string; status: 'success' | 'fail' | 'error'; messag
 
 /**
  * Widget for code input with automatic capture and submission.
- * Input is always focused and ready to receive barcode scanner input.
- * Automatically submits codes when they reach 16 or 126 digits.
- * Global key capture is always active for seamless barcode scanning.
+ * - Only 13-digit numeric codes are accepted and submitted.
+ * - Auto-submits after a short inactivity window or exactly at length 13.
+ * - Keeps the input focused and captures keys globally for scanners.
  */
 const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, onProcessCode }) => {
   const { latestCode } = data;
@@ -31,6 +31,11 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   const inputRef = useRef<HTMLInputElement>(null);
   const processingTimeoutRef = useRef<number | null>(null);
   const autoSubmitTimeoutRef = useRef<number | null>(null);
+  const lastKeyTimeRef = useRef<number>(0);
+
+  // Only accept 13-digit codes
+  const KNOWN_LENGTHS = useRef(new Set<number>([13]));
+  const MIN_INACTIVITY_LENGTH = 13;
 
   const [processedHistory, setProcessedHistory] = useState<HistoryEntry[]>([]);
   
@@ -134,37 +139,40 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   
   // Manejador de cambios en el input manual
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    const digitsOnly = (e.target.value || '').replace(/\D/g, '').slice(0, 13);
+    setInputValue(digitsOnly);
     if (hasError) setHasError(false);
+    scheduleAutoSubmit();
   };
 
-  // Auto-envío cuando el código alcanza 16 dígitos (cajas) o 126 dígitos (otros códigos)
-  // Siempre activo, independientemente del estado del toggle
-  useEffect(() => {
-    // Limpiar timeout anterior
+  // Schedules an auto-submit after a short inactivity window.
+  const scheduleAutoSubmit = useCallback(() => {
+    if (isProcessing) return;
+    lastKeyTimeRef.current = Date.now();
     if (autoSubmitTimeoutRef.current) {
       window.clearTimeout(autoSubmitTimeoutRef.current);
-      autoSubmitTimeoutRef.current = null;
     }
-    
-    const shouldAutoSubmit = (inputValue.length === 16 || inputValue.length === 126) && !isProcessing;
-    
-    if (shouldAutoSubmit) {
-      // Delay para asegurar que el scanner haya terminado
-      autoSubmitTimeoutRef.current = window.setTimeout(() => {
-        handleSubmit();
-        autoSubmitTimeoutRef.current = null;
-      }, 150);
-    }
-    
-    return () => {
-      if (autoSubmitTimeoutRef.current) {
-        window.clearTimeout(autoSubmitTimeoutRef.current);
-        autoSubmitTimeoutRef.current = null;
+    autoSubmitTimeoutRef.current = window.setTimeout(() => {
+      const now = Date.now();
+      const silentForMs = now - lastKeyTimeRef.current;
+      let currentValue = (inputRef.current?.value || inputValue).replace(/\D/g, '');
+      if (currentValue.length > 13 && inputRef.current) {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(inputRef.current, currentValue.slice(0, 13));
+        const inputEvent = new Event('input', { bubbles: true });
+        inputRef.current.dispatchEvent(inputEvent);
+        currentValue = currentValue.slice(0, 13);
       }
-    };
-  }, [inputValue.length, isProcessing, handleSubmit]);
-
+      const currentLength = currentValue.length;
+      const lengthMatch = KNOWN_LENGTHS.current.has(currentLength);
+      const inactivityMatch = currentLength === MIN_INACTIVITY_LENGTH && silentForMs >= 60;
+      if ((lengthMatch || inactivityMatch) && /^\d{13}$/.test(currentValue)) {
+        handleSubmit();
+      }
+      autoSubmitTimeoutRef.current = null;
+    }, 90);
+  }, [handleSubmit, inputValue, isProcessing]);
+  
   // Listener global para Enter - envía el código desde cualquier parte de la página
   useEffect(() => {
     const handleGlobalEnter = (e: KeyboardEvent) => {
@@ -189,7 +197,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   
   // Manejador de teclas en el campo de entrada
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputValue.trim() && !isProcessing) {
+    if (e.key === 'Enter' && /^\d{13}$/.test(inputValue) && !isProcessing) {
       handleSubmit();
     }
   };
@@ -209,12 +217,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         return;
       }
       
-      // Captura global siempre activa para escáneres automáticos
-      // El toggle ahora solo controla la visualización, no la funcionalidad
-      
-      // Expandir el patrón para incluir más caracteres que los escáneres pueden enviar
-      // Incluir números, letras, guiones, guiones bajos, puntos, espacios, y otros símbolos comunes
-      if (/^[a-zA-Z0-9-_. +=/\\|]$/.test(e.key)) {
+      // Aceptar únicamente dígitos enviados por el escáner
+      if (/^\d$/.test(e.key)) {
         // Asegurar que el input esté enfocado
         if (inputRef.current && document.activeElement !== inputRef.current) {
           inputRef.current.focus();
@@ -225,8 +229,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           e.preventDefault();
           
           // Usar el valor actual del input desde el DOM para evitar problemas de estado stale
-          const currentValue = inputRef.current.value || '';
-          const newValue = currentValue + e.key;
+          const currentValue = (inputRef.current.value || '').replace(/\D/g, '');
+          const newValue = (currentValue + e.key).slice(0, 13);
           
           // Actualizar el valor directamente y disparar evento
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
@@ -236,6 +240,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
             const inputEvent = new Event('input', { bubbles: true });
             inputRef.current.dispatchEvent(inputEvent);
           }
+          // Programar auto envío tras inactividad del escáner
+          scheduleAutoSubmit();
         }
       }
     };
@@ -246,7 +252,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     return () => {
       document.removeEventListener('keydown', handleGlobalKeyDown, true);
     };
-  }, [isProcessing]);
+  }, [isProcessing, scheduleAutoSubmit]);
   
   const inputStyles: React.CSSProperties = {
     width: '100%',
@@ -324,7 +330,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Siempre listo para escanear - envío automático a 16/126 dígitos"
+          placeholder="Escanee código de 13 dígitos (envío automático)"
           style={{
             ...inputStyles,
             borderColor: hasError ? '#FF3B30' : theme.colors.border.light
@@ -338,7 +344,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         <Button 
           onClick={handleSubmit} 
           style={buttonStyles}
-          disabled={!inputValue.trim()}
+          disabled={!/^\d{13}$/.test(inputValue)}
         >
           Enviar
         </Button>
