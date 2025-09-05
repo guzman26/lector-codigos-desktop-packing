@@ -18,8 +18,8 @@ type HistoryEntry = { code: string; status: 'success' | 'fail' | 'error'; messag
 
 /**
  * Widget for code input with automatic capture and submission.
- * - Only 13-digit numeric codes are accepted and submitted.
- * - Auto-submits after a short inactivity window or exactly at length 13.
+ * - Only 16-digit numeric codes are accepted and submitted.
+ * - Auto-submits after a short inactivity window or exactly at length 16.
  * - Keeps the input focused and captures keys globally for scanners.
  */
 const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, onProcessCode }) => {
@@ -33,9 +33,9 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   const autoSubmitTimeoutRef = useRef<number | null>(null);
   const lastKeyTimeRef = useRef<number>(0);
 
-  // Only accept 13-digit codes
-  const KNOWN_LENGTHS = useRef(new Set<number>([13]));
-  const MIN_INACTIVITY_LENGTH = 13;
+  // Only accept 16-digit codes
+  const KNOWN_LENGTHS = useRef(new Set<number>([16]));
+  const MIN_INACTIVITY_LENGTH = 16;
 
   const [processedHistory, setProcessedHistory] = useState<HistoryEntry[]>([]);
   
@@ -139,7 +139,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   
   // Manejador de cambios en el input manual
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const digitsOnly = (e.target.value || '').replace(/\D/g, '').slice(0, 13);
+    const digitsOnly = (e.target.value || '').replace(/\D/g, '').slice(0, 16);
     setInputValue(digitsOnly);
     if (hasError) setHasError(false);
     scheduleAutoSubmit();
@@ -156,17 +156,17 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       const now = Date.now();
       const silentForMs = now - lastKeyTimeRef.current;
       let currentValue = (inputRef.current?.value || inputValue).replace(/\D/g, '');
-      if (currentValue.length > 13 && inputRef.current) {
+      if (currentValue.length > 16 && inputRef.current) {
         const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-        nativeSetter?.call(inputRef.current, currentValue.slice(0, 13));
+        nativeSetter?.call(inputRef.current, currentValue.slice(0, 16));
         const inputEvent = new Event('input', { bubbles: true });
         inputRef.current.dispatchEvent(inputEvent);
-        currentValue = currentValue.slice(0, 13);
+        currentValue = currentValue.slice(0, 16);
       }
       const currentLength = currentValue.length;
       const lengthMatch = KNOWN_LENGTHS.current.has(currentLength);
       const inactivityMatch = currentLength === MIN_INACTIVITY_LENGTH && silentForMs >= 60;
-      if ((lengthMatch || inactivityMatch) && /^\d{13}$/.test(currentValue)) {
+      if ((lengthMatch || inactivityMatch) && /^\d{16}$/.test(currentValue)) {
         handleSubmit();
       }
       autoSubmitTimeoutRef.current = null;
@@ -177,7 +177,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   useEffect(() => {
     const handleGlobalEnter = (e: KeyboardEvent) => {
       // Solo procesar si hay contenido y no estamos procesando
-      if (e.key === 'Enter' && inputValue.trim() && !isProcessing) {
+      if (e.key === 'Enter' && /^\d{16}$/.test(inputValue) && !isProcessing) {
         // Verificar que no estemos en inputs que manejan modales o formularios críticos
         const target = e.target as HTMLElement;
         const isInModal = target.closest('[role="dialog"]') !== null;
@@ -197,7 +197,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   
   // Manejador de teclas en el campo de entrada
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && /^\d{13}$/.test(inputValue) && !isProcessing) {
+    if (e.key === 'Enter' && /^\d{16}$/.test(inputValue) && !isProcessing) {
       handleSubmit();
     }
   };
@@ -230,7 +230,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           
           // Usar el valor actual del input desde el DOM para evitar problemas de estado stale
           const currentValue = (inputRef.current.value || '').replace(/\D/g, '');
-          const newValue = (currentValue + e.key).slice(0, 13);
+          const newValue = (currentValue + e.key).slice(0, 16);
           
           // Actualizar el valor directamente y disparar evento
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
@@ -330,7 +330,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Escanee código de 13 dígitos (envío automático)"
+          placeholder="Escanee código de 16 dígitos (envío automático)"
           style={{
             ...inputStyles,
             borderColor: hasError ? '#FF3B30' : theme.colors.border.light
@@ -344,7 +344,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         <Button 
           onClick={handleSubmit} 
           style={buttonStyles}
-          disabled={!/^\d{13}$/.test(inputValue)}
+          disabled={!/^\d{16}$/.test(inputValue)}
         >
           Enviar
         </Button>
