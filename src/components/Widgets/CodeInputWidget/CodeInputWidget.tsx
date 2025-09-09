@@ -63,8 +63,9 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   }, []);
   
   // Manejador de envío del formulario
-  const handleSubmit = useCallback(async () => {
-    const trimmedCode = inputValue.trim();
+  // Acepta un código opcional para evitar condiciones de carrera entre el DOM y el estado de React
+  const handleSubmit = useCallback(async (overrideCode?: string) => {
+    const trimmedCode = (overrideCode ?? inputValue).trim();
     if (!trimmedCode || isProcessing) return;
     
     // Limpiar cualquier timeout pendiente
@@ -167,7 +168,8 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       const lengthMatch = KNOWN_LENGTHS.current.has(currentLength);
       const inactivityMatch = currentLength === MIN_INACTIVITY_LENGTH && silentForMs >= 60;
       if ((lengthMatch || inactivityMatch) && /^\d{16}$/.test(currentValue)) {
-        handleSubmit();
+        // Pasamos el valor actual del DOM para evitar perder el último dígito
+        handleSubmit(currentValue);
       }
       autoSubmitTimeoutRef.current = null;
     }, 90);
@@ -198,7 +200,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   // Manejador de teclas en el campo de entrada
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && /^\d{16}$/.test(inputValue) && !isProcessing) {
-      handleSubmit();
+      handleSubmit(inputValue);
     }
   };
   
@@ -342,7 +344,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           onClick={() => inputRef.current?.focus()}
         />
         <Button 
-          onClick={handleSubmit} 
+          onClick={() => handleSubmit(inputValue)} 
           style={buttonStyles}
           disabled={!/^\d{16}$/.test(inputValue)}
         >
