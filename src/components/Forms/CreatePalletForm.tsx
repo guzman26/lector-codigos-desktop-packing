@@ -18,9 +18,9 @@ const CreatePalletForm: React.FC = () => {
   const [caliber, setCaliber] = useState('');
   const [formatId, setFormatId] = useState('');
   const [company, setCompany] = useState('');
-  const [maxBoxes, setMaxBoxes] = useState<string>('48');
+  const [maxBoxes, setMaxBoxes] = useState<string>('');
 
-  const isValid = shift && caliber && formatId && company && /^\d+$/.test(maxBoxes) && Number(maxBoxes) > 0;
+  const isValid = shift && caliber && formatId && company && (maxBoxes === '' || (/^\d+$/.test(maxBoxes) && Number(maxBoxes) > 0));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +28,7 @@ const CreatePalletForm: React.FC = () => {
 
     const codigo = generatePalletCode(createdAt, shift, caliber, formatId, company);
     // codigo is the 11-digit base code; backend will append 3-digit suffix
-    submit(codigo, Number(maxBoxes));
+    submit(codigo, maxBoxes === '' ? undefined : Number(maxBoxes));
   };
 
   const headerStyles: React.CSSProperties = {
@@ -102,7 +102,7 @@ const CreatePalletForm: React.FC = () => {
             step={1}
             value={maxBoxes}
             onChange={(e) => setMaxBoxes(e.target.value.replace(/[^\d]/g, ''))}
-            placeholder="48"
+            placeholder="Opcional (vacío usa 60)"
             fullWidth
           />
         </div>
