@@ -7,7 +7,7 @@ import {
 } from '../../utils/options';
 import { generatePalletCode } from '../../utils/codeUtils';
 import { useCreatePallet } from '../../hooks/useCreatePallet';
-import { Card, Select, Button, ProgressBar, Alert } from '../ui';
+import { Card, Select, Button, ProgressBar, Alert, Input } from '../ui';
 import { theme } from '../../styles/theme';
 
 const CreatePalletForm: React.FC = () => {
@@ -18,8 +18,9 @@ const CreatePalletForm: React.FC = () => {
   const [caliber, setCaliber] = useState('');
   const [formatId, setFormatId] = useState('');
   const [company, setCompany] = useState('');
+  const [maxBoxes, setMaxBoxes] = useState<string>('48');
 
-  const isValid = shift && caliber && formatId && company;
+  const isValid = shift && caliber && formatId && company && /^\d+$/.test(maxBoxes) && Number(maxBoxes) > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ const CreatePalletForm: React.FC = () => {
 
     const codigo = generatePalletCode(createdAt, shift, caliber, formatId, company);
     // codigo is the 11-digit base code; backend will append 3-digit suffix
-    submit(codigo);
+    submit(codigo, Number(maxBoxes));
   };
 
   const headerStyles: React.CSSProperties = {
@@ -92,6 +93,16 @@ const CreatePalletForm: React.FC = () => {
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             options={EMPRESA_OPTIONS}
+            fullWidth
+          />
+          <Input
+            label="Máx. cajas por pallet"
+            type="number"
+            min={1}
+            step={1}
+            value={maxBoxes}
+            onChange={(e) => setMaxBoxes(e.target.value.replace(/[^\d]/g, ''))}
+            placeholder="48"
             fullWidth
           />
         </div>

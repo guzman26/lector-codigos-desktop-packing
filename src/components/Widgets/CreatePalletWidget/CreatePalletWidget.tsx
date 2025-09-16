@@ -6,6 +6,7 @@ import WidgetCard from '../WidgetCard';
 const CreatePalletWidget: React.FC = () => {
   const { submit, data, loading, error } = useCreatePallet();
   const [codigo, setCodigo] = useState('');
+  const [maxBoxes, setMaxBoxes] = useState('48');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,8 +14,10 @@ const CreatePalletWidget: React.FC = () => {
       alert('El código base debe tener exactamente 11 dígitos');
       return;
     }
-    submit(codigo);
+    const parsedMax = /^\d+$/.test(maxBoxes) ? Number(maxBoxes) : undefined;
+    submit(codigo, parsedMax);
     setCodigo('');
+    setMaxBoxes('48');
   };
 
   return (
@@ -25,6 +28,15 @@ const CreatePalletWidget: React.FC = () => {
           value={codigo}
           onChange={(e) => setCodigo(e.target.value)}
           placeholder="Código base de 11 dígitos…"
+        />
+        <input
+          className={styles.input}
+          type="number"
+          min={1}
+          step={1}
+          value={maxBoxes}
+          onChange={(e) => setMaxBoxes(e.target.value.replace(/[^\d]/g, ''))}
+          placeholder="Máx. cajas (48)"
         />
         <button
           type="submit"

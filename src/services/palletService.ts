@@ -53,10 +53,10 @@ export const deletePallet = (code: string) =>
  * Creates a pallet based on an 11-digit base code (backend appends 3-digit suffix).
  * Example base: 527251021101 → day 5, week 27, year 25, shift 1, calibre 02, formato 1, empresa 01
  */
-export const createPallet = async (codigo: string): Promise<Pallet> => {
+export const createPallet = async (codigo: string, maxBoxes?: number): Promise<Pallet> => {
   const res = await fetchJson<{ pallet?: Pallet }>(`${API_BASE}/createPallet`, {
     method: 'POST',
-    body: JSON.stringify({ codigo }),
+    body: JSON.stringify({ codigo, maxBoxes }),
   });
   if (isApiEnvelope<Pallet | { pallet?: Pallet }>(res)) {
     const data = res.data as Pallet | { pallet?: Pallet } | null | undefined;
