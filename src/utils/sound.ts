@@ -3,7 +3,7 @@
 let htmlAudioElement: HTMLAudioElement | null = null;
 let audioContext: AudioContext | null = null;
 let decodedErrorBuffer: AudioBuffer | null = null;
-let defaultErrorBeepGain = 3.0; // >1.0 amplifies; beware of clipping
+let defaultErrorBeepGain = 5.0; // >1.0 amplifies; beware of clipping
 
 async function ensureAudioContext(): Promise<AudioContext> {
   if (!audioContext) {
