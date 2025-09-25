@@ -4,6 +4,7 @@ import { Button, ToggleSwitch } from '../../ui';
 import { ScanLine } from 'lucide-react';
 import { theme } from '../../../styles/theme';
 import { ApiError } from '../../../services/fetchJson';
+import { playErrorBeep } from '../../../utils/sound';
 
 export interface CodeInputWidgetProps {
   data: {
@@ -102,6 +103,9 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       // Limpiar el input después
       setInputValue('');
       setHasError(!ok);
+      if (!ok) {
+        playErrorBeep();
+      }
     } catch (error) {
       const err = error as ApiError;
       const status: HistoryEntry['status'] = (err.status === 'fail' || err.status === 'error') ? err.status : 'error';
@@ -111,6 +115,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
         ...prev
       ].slice(0, 10));
       setHasError(true);
+      playErrorBeep();
     } finally {
       // Usar un timeout mínimo para evitar conflictos con códigos rápidos
       processingTimeoutRef.current = window.setTimeout(() => {
