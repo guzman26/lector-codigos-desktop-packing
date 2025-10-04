@@ -71,7 +71,7 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
   };
 
   return (
-    <Card variant="blur" padding="large">
+    <Card variant="blur" padding="medium">
       <div style={headerStyles}>
         <div style={titleWrapperStyles}>
           {icon && <div style={iconStyles}>{icon}</div>}

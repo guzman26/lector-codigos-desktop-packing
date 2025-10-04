@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Card } from '../ui';
 import { theme } from '../../styles/theme';
 import CodeInputWidget from '../Widgets/CodeInputWidget/CodeInputWidget';
 import { useCreateBox } from '../../hooks/useCreateBox';
@@ -36,7 +35,7 @@ const Dashboard: React.FC = () => {
   const gridStyles: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-    gap: theme.spacing.xl,
+    gap: theme.spacing.lg,
     width: '100%',
   };
 
@@ -55,43 +54,32 @@ const Dashboard: React.FC = () => {
     <section>
       {/* Primary Operations Section */}
       <h2 style={sectionTitleStyles}>Operaciones Principales</h2>
-      <div style={{ ...gridStyles, marginBottom: theme.spacing['3xl'] }}>
-        <Card variant="elevated" style={primaryWidgetStyles}>
+      <div style={{ ...gridStyles, marginBottom: theme.spacing['2xl'] }}>
+        <div style={primaryWidgetStyles}>
           <CodeInputWidget 
             data={codeData} 
             onCodeSubmit={handleCodeSubmit}
             onProcessCode={processCode}
           />
-        </Card>
-        
+        </div>
       </div>
 
       {/* Inventory Management Section */}
       <h2 style={sectionTitleStyles}>Gestión de Inventario</h2>
-      <div style={{ ...gridStyles, marginBottom: theme.spacing['3xl'] }}>
-        <Card variant="default" >
-          <UnassignedBoxesWidget />
-        </Card>
-        <Card variant="elevated" style={primaryWidgetStyles}>
+      <div style={{ ...gridStyles, marginBottom: theme.spacing['2xl'] }}>
+        <UnassignedBoxesWidget />
+        <div style={primaryWidgetStyles}>
           <ActivePalletsWidget />
-        </Card>
+        </div>
       </div>
 
       {/* System & Operations Section */}
       <h2 style={sectionTitleStyles}>Sistema y Operaciones</h2>
       <div style={gridStyles}>
-        <Card variant="blur">
-          <SystemInfoWidget data={{}} />
-        </Card>
-        <Card variant="blur">
-          <IssueReporterWidget />
-        </Card>
-        <Card variant="blur">
-          <CreatePalletWidget />
-        </Card>
-        <Card variant="blur">
-          <CreateBoxWidget />
-        </Card>
+        <SystemInfoWidget data={{}} />
+        <IssueReporterWidget />
+        <CreatePalletWidget />
+        <CreateBoxWidget />
       </div>
     </section>
   );
