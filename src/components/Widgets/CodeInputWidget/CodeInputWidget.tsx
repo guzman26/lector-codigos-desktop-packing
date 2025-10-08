@@ -5,6 +5,7 @@ import { ScanLine } from 'lucide-react';
 import { theme } from '../../../styles/theme';
 import { ApiError } from '../../../services/fetchJson';
 import { playErrorBeep } from '../../../utils/sound';
+import { parseBoxCode } from '../../../utils/codeUtils';
 
 export interface CodeInputWidgetProps {
   data: {
@@ -389,12 +390,47 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
             fontSize: theme.typography.fontSize.xl,
             fontWeight: theme.typography.fontWeight.bold,
             marginBottom: theme.spacing.md,
-            padding: theme.spacing.sm,
+            padding: theme.spacing.md,
             backgroundColor: theme.colors.background.tertiary,
             borderRadius: theme.borderRadius.md,
             border: `1px solid ${theme.colors.border.light}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: theme.spacing.lg,
           }}>
-            {latestCode}
+            <span style={{ 
+              fontFamily: theme.typography.fontFamily.mono,
+              color: theme.colors.accent.green,
+            }}>
+              {latestCode}
+            </span>
+            {(() => {
+              const parsedInfo = parseBoxCode(latestCode);
+              if (parsedInfo) {
+                return (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    gap: theme.spacing.xs,
+                    textAlign: 'right',
+                    fontFamily: theme.typography.fontFamily.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                  }}>
+                    <div style={{ color: theme.colors.text.primary }}>
+                      {parsedInfo.calibreText} <span style={{ color: theme.colors.text.secondary }}>(calibre)</span>
+                    </div>
+                    <div style={{ color: theme.colors.text.primary }}>
+                      {parsedInfo.operario} <span style={{ color: theme.colors.text.secondary }}>(operario)</span>
+                    </div>
+                    <div style={{ color: theme.colors.text.primary }}>
+                      {parsedInfo.numeroCaja} <span style={{ color: theme.colors.text.secondary }}>(n° de caja)</span>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
 
           {/* Recent history with status and message */}
@@ -416,26 +452,49 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
                 flexDirection: 'column',
                 gap: theme.spacing.xs,
               }}>
-                {processedHistory.map((entry, idx) => (
-                  <li key={`${entry.code}-${idx}`} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: theme.spacing.md,
-                    padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
-                    border: `1px solid ${theme.colors.border.light}`,
-                    borderRadius: theme.borderRadius.md,
-                    backgroundColor: theme.colors.background.tertiary,
-                    fontSize: theme.typography.fontSize.sm,
-                    fontFamily: theme.typography.fontFamily.mono,
-                  }}>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.code}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.sm }}>
-                      <span style={{ ...badgeStyles, ...statusColor(entry.status) }}>{entry.status.toUpperCase()}</span>
-                      <span style={{ fontFamily: theme.typography.fontFamily.primary }}>{entry.message}</span>
-                    </span>
-                  </li>
-                ))}
+                {processedHistory.map((entry, idx) => {
+                  const parsedInfo = parseBoxCode(entry.code);
+                  return (
+                    <li key={`${entry.code}-${idx}`} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: theme.spacing.md,
+                      padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
+                      border: `1px solid ${theme.colors.border.light}`,
+                      borderRadius: theme.borderRadius.md,
+                      backgroundColor: theme.colors.background.tertiary,
+                      fontSize: theme.typography.fontSize.sm,
+                      fontFamily: theme.typography.fontFamily.mono,
+                    }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.code}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.md }}>
+                        {parsedInfo && (
+                          <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            gap: '2px',
+                            textAlign: 'right',
+                            fontFamily: theme.typography.fontFamily.primary,
+                            fontSize: theme.typography.fontSize.xs,
+                            minWidth: '150px',
+                          }}>
+                            <div style={{ color: theme.colors.text.secondary }}>
+                              {parsedInfo.calibreText}
+                            </div>
+                            <div style={{ color: theme.colors.text.secondary }}>
+                              Op: {parsedInfo.operario} | Caja: {parsedInfo.numeroCaja}
+                            </div>
+                          </div>
+                        )}
+                        <span style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.sm }}>
+                          <span style={{ ...badgeStyles, ...statusColor(entry.status) }}>{entry.status.toUpperCase()}</span>
+                          <span style={{ fontFamily: theme.typography.fontFamily.primary }}>{entry.message}</span>
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}

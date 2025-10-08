@@ -38,4 +38,42 @@ export const getCalibreText = (calibreCode: string): string => {
   
   const calibreOption = CALIBRE_OPTIONS.find(option => option.value === calibreCode);
   return calibreOption ? calibreOption.label : calibreCode;
+};
+
+/**
+ * Interface for parsed box code information
+ */
+export interface ParsedBoxInfo {
+  calibre: string;
+  calibreText: string;
+  operario: string;
+  numeroCaja: string;
+}
+
+/**
+ * Parses a 16-digit box code and extracts calibre, operario, and box number
+ * Format assumption based on example: 3412506410611016
+ * - Calibre: positions 10-11 (0-indexed) -> "06"
+ * - Operario: positions 8-9 (0-indexed) -> "10" 
+ * - Número de caja: positions 13-15 (0-indexed) -> "016"
+ * 
+ * @param code - The 16-digit box code
+ * @returns Parsed box information or null if code is invalid
+ */
+export const parseBoxCode = (code: string): ParsedBoxInfo | null => {
+  if (!code || code.length !== 16 || !/^\d{16}$/.test(code)) {
+    return null;
+  }
+
+  // Extract information from specific positions
+  const calibreCode = code.substring(10, 12); // positions 10-11
+  const operario = code.substring(8, 10);     // positions 8-9
+  const numeroCaja = code.substring(13, 16);  // positions 13-15
+
+  return {
+    calibre: calibreCode,
+    calibreText: getCalibreText(calibreCode),
+    operario,
+    numeroCaja,
+  };
 }; 
