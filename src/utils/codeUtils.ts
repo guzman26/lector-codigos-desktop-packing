@@ -52,10 +52,17 @@ export interface ParsedBoxInfo {
 
 /**
  * Parses a 16-digit box code and extracts calibre, operario, and box number
- * Format assumption based on example: 3412506410611016
- * - Calibre: positions 10-11 (0-indexed) -> "06"
- * - Operario: positions 8-9 (0-indexed) -> "10" 
- * - Número de caja: positions 13-15 (0-indexed) -> "016"
+ * Format based on barcode structure: 4272516310211001
+ * - Day of week: position 0 (0-indexed) -> "4"
+ * - Week of year: positions 1-2 (0-indexed) -> "27"
+ * - Year: positions 3-4 (0-indexed) -> "25"
+ * - Operario: positions 5-6 (0-indexed) -> "16"
+ * - Packer machine: position 7 (0-indexed) -> "3"
+ * - Shift: position 8 (0-indexed) -> "1"
+ * - Calibre: positions 9-10 (0-indexed) -> "02"
+ * - Format: position 11 (0-indexed) -> "1"
+ * - Company: position 12 (0-indexed) -> "1"
+ * - Número de caja: positions 13-15 (0-indexed) -> "001"
  * 
  * @param code - The 16-digit box code
  * @returns Parsed box information or null if code is invalid
@@ -66,8 +73,8 @@ export const parseBoxCode = (code: string): ParsedBoxInfo | null => {
   }
 
   // Extract information from specific positions
-  const calibreCode = code.substring(10, 12); // positions 10-11
-  const operario = code.substring(8, 10);     // positions 8-9
+  const operario = code.substring(5, 7);      // positions 5-6
+  const calibreCode = code.substring(9, 11);  // positions 9-10
   const numeroCaja = code.substring(13, 16);  // positions 13-15
 
   return {
