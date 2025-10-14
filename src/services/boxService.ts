@@ -14,27 +14,25 @@ export interface BoxDetails extends Box {
   [key: string]: unknown;
 }
 
-// Process scanned code (BOX or PALLET) - use consolidated /inventory endpoint
+// Process scanned code (BOX) - create box in system
 export const createBox = async (boxData: unknown): Promise<BoxDetails> => {
   const codigo = String(boxData ?? '');
-  const res = await fetchJson<ConsolidatedResponse<PaginatedData<BoxDetails>>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ConsolidatedResponse<BoxDetails>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
-      action: 'get',
-      codigo
+      action: 'create',
+      codigo,
+      ubicacion: 'PACKING'  // Default location for scanned boxes
     }),
   });
   
   if (res && typeof res === 'object' && 'success' in res && res.success) {
-    const data = res.data as PaginatedData<BoxDetails>;
-    const box = data?.items?.[0];
-    if (box) {
-      return { ...box, code: box.codigo || codigo } as BoxDetails;
-    }
+    const box = res.data;
+    return { ...box, code: box.codigo || codigo } as BoxDetails;
   }
   
-  throw new Error('Box not found or could not be processed');
+  throw new Error('Box could not be created');
 };
 
 // Get box by 16-digit code - use consolidated /inventory endpoint
