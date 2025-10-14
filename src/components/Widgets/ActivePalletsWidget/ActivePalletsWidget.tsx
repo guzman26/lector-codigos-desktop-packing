@@ -29,10 +29,10 @@ const ActivePalletsWidget: React.FC = () => {
   const metrics = useMemo(() => {
     if (!data.length) return null;
 
-    const totalCapacity = data.reduce((sum, p) => sum + p.cantidadCajas, 0);
+    const totalCapacity = data.reduce((sum, p) => sum + (p.cantidadCajas ?? 0), 0);
     const avgCapacity = totalCapacity / data.length;
-    const nearFull = data.filter(p => (p.cantidadCajas / 100) >= 0.8).length;
-    const criticalPallets = data.filter(p => (p.cantidadCajas / 100) >= 0.95);
+    const nearFull = data.filter(p => ((p.cantidadCajas ?? 0) / 100) >= 0.8).length;
+    const criticalPallets = data.filter(p => ((p.cantidadCajas ?? 0) / 100) >= 0.95);
 
     return {
       total: data.length,
@@ -48,12 +48,12 @@ const ActivePalletsWidget: React.FC = () => {
     
     switch (sortBy) {
       case 'capacity':
-        return sorted.sort((a, b) => b.cantidadCajas - a.cantidadCajas);
+        return sorted.sort((a, b) => (b.cantidadCajas ?? 0) - (a.cantidadCajas ?? 0));
       case 'rate':
         // Sort by fill rate (boxes per hour)
         return sorted.sort((a, b) => {
-          const rateA = a.cantidadCajas / Math.max(1, (new Date().getTime() - new Date(a.fechaCreacion).getTime()) / (1000 * 60 * 60));
-          const rateB = b.cantidadCajas / Math.max(1, (new Date().getTime() - new Date(b.fechaCreacion).getTime()) / (1000 * 60 * 60));
+          const rateA = (a.cantidadCajas ?? 0) / Math.max(1, (new Date().getTime() - new Date(a.fechaCreacion).getTime()) / (1000 * 60 * 60));
+          const rateB = (b.cantidadCajas ?? 0) / Math.max(1, (new Date().getTime() - new Date(b.fechaCreacion).getTime()) / (1000 * 60 * 60));
           return rateB - rateA;
         });
       default:

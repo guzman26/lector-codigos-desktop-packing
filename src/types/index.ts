@@ -1,12 +1,17 @@
 export interface Pallet {
     id: string;
     codigo: string;
-    cantidadCajas: number;
+    cantidadCajas?: number; // Optional: may be undefined for legacy data
     estado: string;
     ubicacion: string;
     fechaCreacion: string;
-    cajas: [];
-    fechaCalibreFormato: string;
+    cajas?: string[]; // Optional: may be boxes instead
+    boxes?: string[]; // Alternative field name from API
+    fechaCalibreFormato?: string;
+    calibre?: string;
+    formato?: string;
+    maxBoxes?: number;
+    fechaCierre?: string | null;
   }
   
   export interface UnassignedBox {
@@ -24,4 +29,30 @@ export interface Pallet {
     palletId?: string;
     semana?: string;
     ubicacion?: string;
+  }
+
+  export interface ApiEnvelope<T = unknown> {
+    status: 'success' | 'fail' | 'error';
+    data?: T | null;
+    message?: string;
+    meta?: {
+      requestId?: string;
+      timestamp?: string;
+    };
+  }
+
+  // Consolidated API response types
+  export interface ConsolidatedResponse<T> {
+    success: boolean;
+    data: T;
+    error?: {
+      code: string;
+      message: string;
+    };
+  }
+
+  export interface PaginatedData<T> {
+    items: T[];
+    count: number;
+    nextKey?: string | null;
   }

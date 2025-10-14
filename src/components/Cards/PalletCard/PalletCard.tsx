@@ -74,14 +74,14 @@ export const PalletCard = memo<PalletCardProps>(({
   };
 
   const getCapacityStatus = () => {
-    const percentage = (pallet.cantidadCajas / maxBoxes) * 100;
+    const percentage = ((pallet.cantidadCajas ?? 0) / maxBoxes) * 100;
     if (percentage >= 95) return { color: theme.colors.accent.red, label: 'Casi lleno' };
     if (percentage >= 80) return { color: theme.colors.accent.orange, label: 'Alto' };
     if (percentage >= 50) return { color: theme.colors.accent.blue, label: 'Medio' };
     return { color: theme.colors.accent.green, label: 'Bajo' };
   };
 
-  const capacityPercentage = Math.min((pallet.cantidadCajas / maxBoxes) * 100, 100);
+  const capacityPercentage = Math.min(((pallet.cantidadCajas ?? 0) / maxBoxes) * 100, 100);
   const capacityStatus = getCapacityStatus();
 
   return (
@@ -130,7 +130,7 @@ export const PalletCard = memo<PalletCardProps>(({
               <span className={styles.label}>Cajas:</span>
             </div>
             <span className={styles.value}>
-              <strong>{pallet.cantidadCajas}</strong>/{maxBoxes}
+              <strong>{pallet.cantidadCajas ?? 0}</strong>/{maxBoxes}
               {capacityPercentage >= 80 && (
                 <AlertCircle 
                   size={variant === 'compact' ? 12 : 14} 
@@ -216,8 +216,8 @@ export const PalletCard = memo<PalletCardProps>(({
                 <span className={styles.statLabel}>Tasa llenado</span>
               </div>
               <span className={styles.statValue}>
-                {pallet.cantidadCajas > 0 
-                  ? `${(pallet.cantidadCajas / ((new Date().getTime() - new Date(pallet.fechaCreacion).getTime()) / (1000 * 60 * 60))).toFixed(1)} cajas/h`
+                {(pallet.cantidadCajas ?? 0) > 0 
+                  ? `${((pallet.cantidadCajas ?? 0) / ((new Date().getTime() - new Date(pallet.fechaCreacion).getTime()) / (1000 * 60 * 60))).toFixed(1)} cajas/h`
                   : '0 cajas/h'
                 }
               </span>
