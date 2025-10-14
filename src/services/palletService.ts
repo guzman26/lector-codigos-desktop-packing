@@ -11,7 +11,8 @@ export const fetchActivePallets = async (): Promise<Pallet[]> => {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
-      action: 'getActive',
+      action: 'get',
+      estado: 'open',
       ubicacion: 'PACKING'
     })
   });
@@ -30,7 +31,8 @@ export const fetchAllPallets = async (): Promise<Pallet[]> => {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
-      action: 'getActive',
+      action: 'get',
+      estado: 'open',
       ubicacion: 'PACKING'
     })
   });
