@@ -7,10 +7,10 @@ export const useCreatePallet = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const submit = async (codigo: string, maxBoxes?: number) => {
+  const submit = async (codigo: string, maxBoxes?: number, horarios?: string[]) => {
     setLoading(true);
     try {
-      setData(await createPallet(codigo, maxBoxes));
+      setData(await createPallet(codigo, maxBoxes, horarios));
       setError(null);
     } catch (err) {
       setError(err as Error);

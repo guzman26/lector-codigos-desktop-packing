@@ -119,8 +119,9 @@ export const deletePallet = async (code: string) => {
 /**
  * Creates a pallet based on an 11-digit base code (backend appends 3-digit suffix).
  * Example base: 527251021101 → day 5, week 27, year 25, shift 1, calibre 02, formato 1, empresa 01
+ * @param horarios Array de hasta 3 horarios/turnos permitidos para este pallet
  */
-export const createPallet = async (codigo: string, maxBoxes?: number): Promise<Pallet> => {
+export const createPallet = async (codigo: string, maxBoxes?: number, horarios?: string[]): Promise<Pallet> => {
   const res = await fetchJson<ConsolidatedResponse<Pallet>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
@@ -128,7 +129,8 @@ export const createPallet = async (codigo: string, maxBoxes?: number): Promise<P
       action: 'create',
       codigo,
       ubicacion: 'PACKING',
-      maxBoxes
+      maxBoxes,
+      horarios: horarios || []
     })
   });
   

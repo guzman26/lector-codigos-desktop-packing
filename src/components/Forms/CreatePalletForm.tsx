@@ -14,21 +14,33 @@ const CreatePalletForm: React.FC = () => {
   const { submit, data, loading, error } = useCreatePallet();
   const [createdAt] = useState(() => new Date());
 
-  const [shift, setShift] = useState('');
+  const [shifts, setShifts] = useState<string[]>([]);
   const [caliber, setCaliber] = useState('');
   const [formatId, setFormatId] = useState('');
   const [company, setCompany] = useState('');
   const [maxBoxes, setMaxBoxes] = useState<string>('');
 
-  const isValid = shift && caliber && formatId && company && (maxBoxes === '' || (/^\d+$/.test(maxBoxes) && Number(maxBoxes) > 0));
+  const isValid = shifts.length > 0 && caliber && formatId && company && (maxBoxes === '' || (/^\d+$/.test(maxBoxes) && Number(maxBoxes) > 0));
+
+  const handleShiftToggle = (shiftValue: string) => {
+    setShifts((prev) => {
+      if (prev.includes(shiftValue)) {
+        return prev.filter((s) => s !== shiftValue);
+      } else {
+        if (prev.length >= 3) return prev;
+        return [...prev, shiftValue];
+      }
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
 
-    const codigo = generatePalletCode(createdAt, shift, caliber, formatId, company);
+    // Usar el primer turno para el código base
+    const codigo = generatePalletCode(createdAt, shifts[0], caliber, formatId, company);
     // codigo is the 11-digit base code; backend will append 3-digit suffix
-    submit(codigo, maxBoxes === '' ? undefined : Number(maxBoxes));
+    submit(codigo, maxBoxes === '' ? undefined : Number(maxBoxes), shifts);
   };
 
   const headerStyles: React.CSSProperties = {
@@ -67,13 +79,32 @@ const CreatePalletForm: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
         <div style={fieldGridStyles}>
-          <Select
-            label="Turno"
-            value={shift}
-            onChange={(e) => setShift(e.target.value)}
-            options={TURNO_OPTIONS}
-            fullWidth
-          />
+          {/* Turnos (Checkboxes) */}
+          <div>
+            <label style={{ display: 'block', marginBottom: theme.spacing.sm, fontSize: theme.typography.fontSize.sm, color: theme.colors.text.secondary }}>
+              Turnos (máximo 3)
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.sm }}>
+              {TURNO_OPTIONS.map((option) => (
+                <label key={option.value} style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.sm, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={shifts.includes(option.value)}
+                    onChange={() => handleShiftToggle(option.value)}
+                    disabled={!shifts.includes(option.value) && shifts.length >= 3}
+                    style={{ width: '16px', height: '16px' }}
+                  />
+                  <span style={{ fontSize: theme.typography.fontSize.sm }}>{option.label}</span>
+                </label>
+              ))}
+            </div>
+            {shifts.length >= 3 && (
+              <p style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.secondary, marginTop: theme.spacing.xs }}>
+                Máximo 3 turnos seleccionados
+              </p>
+            )}
+          </div>
+
           <Select
             label="Calibre"
             value={caliber}
