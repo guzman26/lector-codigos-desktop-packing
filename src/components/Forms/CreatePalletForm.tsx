@@ -22,15 +22,12 @@ const CreatePalletForm: React.FC = () => {
 
   const isValid = shifts.length > 0 && caliber && formatId && company && (maxBoxes === '' || (/^\d+$/.test(maxBoxes) && Number(maxBoxes) > 0));
 
-  const handleShiftToggle = (shiftValue: string) => {
-    setShifts((prev) => {
-      if (prev.includes(shiftValue)) {
-        return prev.filter((s) => s !== shiftValue);
-      } else {
-        if (prev.length >= 3) return prev;
-        return [...prev, shiftValue];
-      }
-    });
+  const handleShiftChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+    // Limit to maximum 3 shifts
+    if (selectedOptions.length <= 3) {
+      setShifts(selectedOptions);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -79,30 +76,34 @@ const CreatePalletForm: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
         <div style={fieldGridStyles}>
-          {/* Turnos (Checkboxes) */}
+          {/* Turnos (Multi-select Dropdown) */}
           <div>
             <label style={{ display: 'block', marginBottom: theme.spacing.sm, fontSize: theme.typography.fontSize.sm, color: theme.colors.text.secondary }}>
               Turnos (máximo 3)
             </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.sm }}>
+            <select
+              multiple
+              value={shifts}
+              onChange={handleShiftChange}
+              style={{
+                width: '100%',
+                padding: `${theme.spacing.sm} ${theme.spacing.md}`,
+                borderRadius: theme.borderRadius.md,
+                border: `1px solid ${theme.colors.border.light}`,
+                backgroundColor: theme.colors.background.secondary,
+                color: theme.colors.text.primary,
+                fontSize: theme.typography.fontSize.sm,
+                fontFamily: 'inherit',
+                cursor: 'pointer',
+              }}
+              size={3}
+            >
               {TURNO_OPTIONS.map((option) => (
-                <label key={option.value} style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.sm, cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={shifts.includes(option.value)}
-                    onChange={() => handleShiftToggle(option.value)}
-                    disabled={!shifts.includes(option.value) && shifts.length >= 3}
-                    style={{ width: '16px', height: '16px' }}
-                  />
-                  <span style={{ fontSize: theme.typography.fontSize.sm }}>{option.label}</span>
-                </label>
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
-            </div>
-            {shifts.length >= 3 && (
-              <p style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.secondary, marginTop: theme.spacing.xs }}>
-                Máximo 3 turnos seleccionados
-              </p>
-            )}
+            </select>
           </div>
 
           <Select
@@ -164,4 +165,4 @@ const CreatePalletForm: React.FC = () => {
   );
 };
 
-export default CreatePalletForm; 
+export default CreatePalletForm;
