@@ -3,11 +3,7 @@ import { theme } from '../../styles/theme';
 import CodeInputWidget from '../Widgets/CodeInputWidget/CodeInputWidget';
 import { useCreateBox } from '../../hooks/useCreateBox';
 import ActivePalletsWidget from '../Widgets/ActivePalletsWidget/ActivePalletsWidget';
-import SystemInfoWidget from '../Widgets/SystemInfoWidget/SystemInfoWidget';
-import IssueReporterWidget from '../Widgets/IssueReporterWidget/IssueReporterWidget';
-import CreateBoxWidget from '../Widgets/CreateBoxWidget/CreateBoxWidget';
 import UnassignedBoxesWidget from '../Widgets/UnassignedBoxesWidget/UnassignedBoxesWidget';
-import CreatePalletWidget from '../Widgets/CreatePalletWidget/CreatePalletWidget';
 
 /**
  * Dashboard is a pure composition layer; no data-fetching logic.
@@ -66,20 +62,11 @@ const Dashboard: React.FC = () => {
 
       {/* Inventory Management Section */}
       <h2 style={sectionTitleStyles}>Gestión de Inventario</h2>
-      <div style={{ ...gridStyles, marginBottom: theme.spacing['2xl'] }}>
+      <div style={gridStyles}>
         <UnassignedBoxesWidget />
         <div style={primaryWidgetStyles}>
           <ActivePalletsWidget />
         </div>
-      </div>
-
-      {/* System & Operations Section */}
-      <h2 style={sectionTitleStyles}>Sistema y Operaciones</h2>
-      <div style={gridStyles}>
-        <SystemInfoWidget data={{}} />
-        <IssueReporterWidget />
-        <CreatePalletWidget />
-        <CreateBoxWidget />
       </div>
     </section>
   );
