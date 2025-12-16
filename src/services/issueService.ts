@@ -22,13 +22,14 @@ export const postIssue = async (issue: string) => {
   
   if (isApiEnvelope(res)) {
     const isSuccess = res.status === 'success';
+    const data = res.data as { issueId: string } | undefined;
     return {
       success: isSuccess,
       message: isSuccess 
         ? (res.message || 'Issue reported successfully')
         : (res.message || 'Failed to report issue'),
       data: res.data,
-      ticketId: res.data?.issueId,
+      ticketId: data?.issueId,
     } as IssueResponse;
   }
   

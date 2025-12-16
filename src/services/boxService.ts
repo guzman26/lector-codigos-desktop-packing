@@ -28,7 +28,7 @@ export const createBox = async (boxData: unknown): Promise<BoxDetails> => {
   });
   
   if (isApiEnvelope(res) && res.status === 'success' && res.data) {
-    const box = res.data;
+    const box = res.data as BoxDetails;
     return { ...box, code: box.codigo || codigo } as BoxDetails;
   }
   
@@ -118,9 +118,10 @@ export const createSingleBoxPallet = async (boxCode: string, ubicacion: string) 
   });
   
   if (isApiEnvelope(res) && res.status === 'success' && res.data) {
+    const data = res.data as SuccessWithPalletId;
     return {
       success: true,
-      palletId: res.data?.palletId
+      palletId: data?.palletId
     };
   }
   
@@ -141,9 +142,10 @@ export const assignBoxToCompatiblePallet = async (codigo: string) => {
   });
   
   if (isApiEnvelope(res) && res.status === 'success' && res.data) {
+    const data = res.data as SuccessWithPalletId;
     return {
       success: true,
-      palletId: res.data?.palletId
+      palletId: data?.palletId
     };
   }
   

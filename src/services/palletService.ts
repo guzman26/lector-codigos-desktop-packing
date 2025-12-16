@@ -135,7 +135,7 @@ export const createPallet = async (codigo: string, maxBoxes?: number, horarios?:
   });
   
   if (isApiEnvelope(res) && res.status === 'success' && res.data) {
-    return res.data;
+    return res.data as Pallet;
   }
   
   throw new Error('Failed to create pallet');
