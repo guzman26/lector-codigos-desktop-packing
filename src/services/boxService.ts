@@ -1,6 +1,6 @@
-import { fetchJson } from './fetchJson';  
+import { fetchJson, isApiEnvelope } from './fetchJson';  
 import { API_BASE } from './index';
-import type { UnassignedBox, ConsolidatedResponse, PaginatedData } from '../types';
+import type { UnassignedBox, ApiEnvelope, PaginatedData } from '../types';
 
 export interface Box {
   id: string;
@@ -17,7 +17,7 @@ export interface BoxDetails extends Box {
 // Process scanned code (BOX) - create box in system
 export const createBox = async (boxData: unknown): Promise<BoxDetails> => {
   const codigo = String(boxData ?? '');
-  const res = await fetchJson<ConsolidatedResponse<BoxDetails>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<BoxDetails>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
@@ -27,7 +27,7 @@ export const createBox = async (boxData: unknown): Promise<BoxDetails> => {
     }),
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     const box = res.data;
     return { ...box, code: box.codigo || codigo } as BoxDetails;
   }
@@ -37,7 +37,7 @@ export const createBox = async (boxData: unknown): Promise<BoxDetails> => {
 
 // Get box by 16-digit code - use consolidated /inventory endpoint
 export const getBoxByCode = async (code: string): Promise<BoxDetails> => {
-  const res = await fetchJson<ConsolidatedResponse<PaginatedData<BoxDetails>>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<PaginatedData<BoxDetails>>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
@@ -46,7 +46,7 @@ export const getBoxByCode = async (code: string): Promise<BoxDetails> => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     const data = res.data as PaginatedData<BoxDetails>;
     const box = data?.items?.[0];
     if (box) {
@@ -58,7 +58,7 @@ export const getBoxByCode = async (code: string): Promise<BoxDetails> => {
 };
 
 export const deleteBox = async (boxCode: string) => {
-  const res = await fetchJson<ConsolidatedResponse<{ codigo: string; message: string }>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<{ codigo: string; message: string }>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
@@ -67,15 +67,15 @@ export const deleteBox = async (boxCode: string) => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res) {
-    return { success: res.success };
+  if (isApiEnvelope(res)) {
+    return { success: res.status === 'success' };
   }
   
   return { success: false };
 };
 
 export const getUnassignedBoxesInPacking = async (limit = 50, lastKey?: string) => {
-  const res = await fetchJson<ConsolidatedResponse<PaginatedData<UnassignedBox>>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<PaginatedData<UnassignedBox>>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
@@ -86,7 +86,7 @@ export const getUnassignedBoxesInPacking = async (limit = 50, lastKey?: string) 
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     const data = res.data as PaginatedData<UnassignedBox>;
     return {
       items: data?.items || [],
@@ -106,7 +106,7 @@ interface SuccessWithPalletId { palletId?: string }
  * Creates a single box pallet for an unassigned box
  */
 export const createSingleBoxPallet = async (boxCode: string, ubicacion: string) => {
-  const res = await fetchJson<ConsolidatedResponse<SuccessWithPalletId>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<SuccessWithPalletId>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
@@ -117,7 +117,7 @@ export const createSingleBoxPallet = async (boxCode: string, ubicacion: string) 
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     return {
       success: true,
       palletId: res.data?.palletId
@@ -131,7 +131,7 @@ export const createSingleBoxPallet = async (boxCode: string, ubicacion: string) 
  * Assigns a box to a compatible existing pallet
  */
 export const assignBoxToCompatiblePallet = async (codigo: string) => {
-  const res = await fetchJson<ConsolidatedResponse<SuccessWithPalletId>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<SuccessWithPalletId>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
@@ -140,7 +140,7 @@ export const assignBoxToCompatiblePallet = async (codigo: string) => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     return {
       success: true,
       palletId: res.data?.palletId

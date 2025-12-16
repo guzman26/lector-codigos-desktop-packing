@@ -33,6 +33,23 @@ const hasStatusKey = (value: unknown): value is { status: string } => {
 
 export const isApiEnvelope = <T = unknown>(value: unknown): value is ApiEnvelope<T> => hasStatusKey(value);
 
+/**
+ * Helper function to check if an ApiEnvelope response is successful
+ */
+export const isSuccessfulResponse = <T>(response: ApiEnvelope<T> | T): response is ApiEnvelope<T> => {
+  return isApiEnvelope(response) && response.status === 'success';
+};
+
+/**
+ * Helper function to extract data from ApiEnvelope response
+ */
+export const extractDataFromEnvelope = <T>(response: ApiEnvelope<T> | T): T | null => {
+  if (isApiEnvelope(response) && response.status === 'success') {
+    return response.data ?? null;
+  }
+  return null;
+};
+
 export async function fetchJson<T = unknown>(
   url: string,
   options: RequestInit = {}

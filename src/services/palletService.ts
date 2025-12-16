@@ -1,13 +1,13 @@
-import { fetchJson } from './fetchJson';
+import { fetchJson, isApiEnvelope } from './fetchJson';
 import { API_BASE } from './index';
-import type { Pallet, UnassignedBox, ConsolidatedResponse, PaginatedData } from '../types';
+import type { Pallet, UnassignedBox, ApiEnvelope, PaginatedData } from '../types';
 
 /**
  * Domain models – keep them minimal; extend as backend evolves.
  */
 
 export const fetchActivePallets = async (): Promise<Pallet[]> => {
-  const res = await fetchJson<ConsolidatedResponse<PaginatedData<Pallet>>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<PaginatedData<Pallet>>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
@@ -17,8 +17,8 @@ export const fetchActivePallets = async (): Promise<Pallet[]> => {
     })
   });
   
-  // Handle ConsolidatedResponse format: { success: true, data: { items, count, nextKey } }
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  // Handle ApiEnvelope format: { status: 'success', data: { items, count, nextKey } }
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     const data = res.data as PaginatedData<Pallet>;
     return data?.items || [];
   }
@@ -27,7 +27,7 @@ export const fetchActivePallets = async (): Promise<Pallet[]> => {
 };
 
 export const fetchAllPallets = async (): Promise<Pallet[]> => {
-  const res = await fetchJson<ConsolidatedResponse<PaginatedData<Pallet>>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<PaginatedData<Pallet>>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
@@ -37,7 +37,7 @@ export const fetchAllPallets = async (): Promise<Pallet[]> => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     const data = res.data as PaginatedData<Pallet>;
     return data?.items || [];
   }
@@ -46,7 +46,7 @@ export const fetchAllPallets = async (): Promise<Pallet[]> => {
 };
 
 export const getUnassignedBoxes = async (): Promise<UnassignedBox[]> => {
-  const res = await fetchJson<ConsolidatedResponse<PaginatedData<UnassignedBox>>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<PaginatedData<UnassignedBox>>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
@@ -56,7 +56,7 @@ export const getUnassignedBoxes = async (): Promise<UnassignedBox[]> => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     const data = res.data as PaginatedData<UnassignedBox>;
     return data?.items || [];
   }
@@ -65,7 +65,7 @@ export const getUnassignedBoxes = async (): Promise<UnassignedBox[]> => {
 };
 
 export const closePallet = async (code: string) => {
-  const res = await fetchJson<ConsolidatedResponse<Pallet>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<Pallet>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
@@ -74,7 +74,7 @@ export const closePallet = async (code: string) => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     return res.data;
   }
   
@@ -82,7 +82,7 @@ export const closePallet = async (code: string) => {
 };
 
 export const deleteBox = async (code: string) => {
-  const res = await fetchJson<ConsolidatedResponse<{ codigo: string; message: string }>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<{ codigo: string; message: string }>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'box',
@@ -91,15 +91,15 @@ export const deleteBox = async (code: string) => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res) {
-    return { success: res.success };
+  if (isApiEnvelope(res)) {
+    return { success: res.status === 'success' };
   }
   
   return { success: false };
 };
 
 export const deletePallet = async (code: string) => {
-  const res = await fetchJson<ConsolidatedResponse<{ codigo: string; message: string }>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<{ codigo: string; message: string }>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
@@ -108,8 +108,8 @@ export const deletePallet = async (code: string) => {
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res) {
-    return { success: res.success };
+  if (isApiEnvelope(res)) {
+    return { success: res.status === 'success' };
   }
   
   return { success: false };
@@ -122,7 +122,7 @@ export const deletePallet = async (code: string) => {
  * @param horarios Array de hasta 3 horarios/turnos permitidos para este pallet
  */
 export const createPallet = async (codigo: string, maxBoxes?: number, horarios?: string[]): Promise<Pallet> => {
-  const res = await fetchJson<ConsolidatedResponse<Pallet>>(`${API_BASE}/inventory`, {
+  const res = await fetchJson<ApiEnvelope<Pallet>>(`${API_BASE}/inventory`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'pallet',
@@ -134,7 +134,7 @@ export const createPallet = async (codigo: string, maxBoxes?: number, horarios?:
     })
   });
   
-  if (res && typeof res === 'object' && 'success' in res && res.success) {
+  if (isApiEnvelope(res) && res.status === 'success' && res.data) {
     return res.data;
   }
   

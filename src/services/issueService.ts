@@ -1,5 +1,7 @@
-import { fetchJson } from './fetchJson';
+import { fetchJson, isApiEnvelope } from './fetchJson';
 import { API_BASE } from './index';
+import type { ApiEnvelope } from '../types';
+
 export interface IssueResponse {
   success: boolean;
   message: string;
@@ -9,13 +11,7 @@ export interface IssueResponse {
 
 // Report issue - use consolidated /admin endpoint
 export const postIssue = async (issue: string) => {
-  interface ConsolidatedResponse<T> {
-    success: boolean;
-    data?: T;
-    error?: { code: string; message: string };
-  }
-  
-  const res = await fetchJson<ConsolidatedResponse<{ issueId: string }>>(`${API_BASE}/admin`, {
+  const res = await fetchJson<ApiEnvelope<{ issueId: string }>>(`${API_BASE}/admin`, {
     method: 'POST',
     body: JSON.stringify({
       resource: 'issue',
@@ -24,10 +20,13 @@ export const postIssue = async (issue: string) => {
     }),
   });
   
-  if (res && typeof res === 'object' && 'success' in res) {
+  if (isApiEnvelope(res)) {
+    const isSuccess = res.status === 'success';
     return {
-      success: res.success || false,
-      message: res.success ? 'Issue reported successfully' : (res.error?.message || 'Failed to report issue'),
+      success: isSuccess,
+      message: isSuccess 
+        ? (res.message || 'Issue reported successfully')
+        : (res.message || 'Failed to report issue'),
       data: res.data,
       ticketId: res.data?.issueId,
     } as IssueResponse;
