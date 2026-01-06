@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { theme } from '../../styles/theme';
 import CodeInputWidget from '../Widgets/CodeInputWidget/CodeInputWidget';
 import { useCreateBox } from '../../hooks/useCreateBox';
-import ActivePalletsWidget from '../Widgets/ActivePalletsWidget/ActivePalletsWidget';
-import UnassignedBoxesWidget from '../Widgets/UnassignedBoxesWidget/UnassignedBoxesWidget';
 
 /**
  * Dashboard is a pure composition layer; no data-fetching logic.
@@ -58,15 +56,6 @@ const Dashboard: React.FC = () => {
             onCodeSubmit={handleCodeSubmit}
             onProcessCode={processCode}
           />
-        </div>
-      </div>
-
-      {/* Inventory Management Section */}
-      <h2 style={sectionTitleStyles}>Gestión de Inventario</h2>
-      <div style={gridStyles}>
-        <UnassignedBoxesWidget />
-        <div style={primaryWidgetStyles}>
-          <ActivePalletsWidget />
         </div>
       </div>
     </section>

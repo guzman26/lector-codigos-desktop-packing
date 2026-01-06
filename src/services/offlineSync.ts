@@ -6,7 +6,7 @@
  */
 
 import { offlineQueue, type QueuedRequest } from './offlineQueue';
-import { fetchJson, type ApiEnvelope } from './fetchJson';
+import { fetchJson } from './fetchJson';
 
 export interface SyncResult {
   success: number;

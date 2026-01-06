@@ -4,6 +4,7 @@ import { BoxCard } from '../../Cards';
 import WidgetCard from '../WidgetCard';
 import Modal from '../../ui/Modal';
 import { Package, AlertTriangle, Search, Filter, ArrowUp, ArrowDown, Calendar, Ruler, User } from 'lucide-react';
+import { theme } from '../../../styles/theme';
 
 /**
  * UnassignedBoxesWidget - macOS-styled with enhanced UX
