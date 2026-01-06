@@ -87,14 +87,15 @@ const ActivePalletsWidget: React.FC = () => {
 
   const viewAllButtonStyles: React.CSSProperties = {
     backgroundColor: 'transparent',
-    border: `1px solid ${theme.colors.border.light}`,
+    border: `2px solid ${theme.colors.border.light}`,
     color: theme.colors.accent.blue,
-    padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-    borderRadius: theme.borderRadius.md,
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: theme.typography.fontWeight.medium,
+    padding: `${theme.spacing.md} ${theme.spacing.lg}`,
+    borderRadius: theme.borderRadius.lg,
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.semibold,
     cursor: 'pointer',
     transition: `all ${theme.animation.duration.fast} ${theme.animation.easing.default}`,
+    minHeight: '48px',
   };
 
   const sortControlsStyles: React.CSSProperties = {
@@ -120,19 +121,20 @@ const ActivePalletsWidget: React.FC = () => {
 
   const emptyStateStyles: React.CSSProperties = {
     textAlign: 'center',
-    padding: theme.spacing['2xl'],
+    padding: theme.spacing['3xl'],
     color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.xl,
   };
 
   const warningBannerStyles: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    padding: theme.spacing.md,
+    gap: theme.spacing.md,
+    padding: theme.spacing.lg,
     backgroundColor: theme.colors.accent.orange + '20',
-    borderRadius: theme.borderRadius.md,
-    border: `1px solid ${theme.colors.accent.orange}`,
-    marginBottom: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    border: `2px solid ${theme.colors.accent.orange}`,
+    marginBottom: theme.spacing.lg,
   };
 
   return (
@@ -147,10 +149,10 @@ const ActivePalletsWidget: React.FC = () => {
           {/* Critical pallets warning */}
           {metrics?.criticalPallets && metrics.criticalPallets.length > 0 && (
             <div style={warningBannerStyles}>
-              <AlertTriangle size={20} style={{ color: theme.colors.accent.orange }} />
+              <AlertTriangle size={32} style={{ color: theme.colors.accent.orange }} />
               <span style={{ 
-                fontSize: theme.typography.fontSize.sm,
-                fontWeight: theme.typography.fontWeight.medium 
+                fontSize: theme.typography.fontSize.xl,
+                fontWeight: theme.typography.fontWeight.bold 
               }}>
                 {metrics.criticalPallets.length} pallet{metrics.criticalPallets.length > 1 ? 's' : ''} requiere{metrics.criticalPallets.length > 1 ? 'n' : ''} atención inmediata
               </span>
@@ -159,7 +161,8 @@ const ActivePalletsWidget: React.FC = () => {
 
           <div style={headerStyles}>
             <span style={{ 
-              fontSize: theme.typography.fontSize.sm,
+              fontSize: theme.typography.fontSize.xl,
+              fontWeight: theme.typography.fontWeight.semibold,
               color: theme.colors.text.secondary 
             }}>
               Vista previa
@@ -190,15 +193,15 @@ const ActivePalletsWidget: React.FC = () => {
 
           {error && (
             <div style={{ ...emptyStateStyles, color: theme.colors.accent.red }}>
-              <AlertTriangle size={24} style={{ marginBottom: theme.spacing.sm }} />
-              <p>Error: {error.message}</p>
+              <AlertTriangle size={48} style={{ marginBottom: theme.spacing.md }} />
+              <p style={{ fontSize: theme.typography.fontSize.xl, fontWeight: theme.typography.fontWeight.semibold }}>Error: {error.message}</p>
             </div>
           )}
 
           {!loading && !error && data.length === 0 && (
             <div style={emptyStateStyles}>
-              <Package2 size={32} style={{ opacity: 0.5, marginBottom: theme.spacing.sm }} />
-              <p>No hay pallets activos</p>
+              <Package2 size={64} style={{ opacity: 0.5, marginBottom: theme.spacing.md }} />
+              <p style={{ fontSize: theme.typography.fontSize.xl, fontWeight: theme.typography.fontWeight.medium }}>No hay pallets activos</p>
             </div>
           )}
 

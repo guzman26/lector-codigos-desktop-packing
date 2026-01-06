@@ -30,8 +30,8 @@ const Dashboard: React.FC = () => {
   };
   const gridStyles: React.CSSProperties = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-    gap: theme.spacing.lg,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+    gap: theme.spacing['2xl'],
     width: '100%',
   };
 
@@ -40,17 +40,18 @@ const Dashboard: React.FC = () => {
   };
 
   const sectionTitleStyles: React.CSSProperties = {
-    fontSize: theme.typography.fontSize.xl,
-    fontWeight: theme.typography.fontWeight.semibold,
+    fontSize: theme.typography.fontSize['4xl'],
+    fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing['2xl'],
+    marginTop: theme.spacing['2xl'],
   };
 
   return (
     <section>
       {/* Primary Operations Section */}
       <h2 style={sectionTitleStyles}>Operaciones Principales</h2>
-      <div style={{ ...gridStyles, marginBottom: theme.spacing['2xl'] }}>
+      <div style={{ ...gridStyles, marginBottom: theme.spacing['3xl'] }}>
         <div style={primaryWidgetStyles}>
           <CodeInputWidget 
             data={codeData} 

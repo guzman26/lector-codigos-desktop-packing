@@ -56,7 +56,7 @@ const MainTerminal: React.FC = () => {
       <header style={headerStyles}>
         <Container maxWidth="xl" padding={false}>
           <h1 style={{ 
-            fontSize: theme.typography.fontSize['3xl'],
+            fontSize: theme.typography.fontSize['5xl'],
             fontWeight: theme.typography.fontWeight.bold,
             color: theme.colors.text.primary,
             margin: 0,
@@ -75,7 +75,7 @@ const MainTerminal: React.FC = () => {
         >
           <div style={actionBarStyles}>
               <Link to="/create-pallet" style={{ textDecoration: 'none' }}>
-                <Button icon={<Plus size={20} />} size="large">
+                <Button icon={<Plus size={28} />} size="large" style={{ fontSize: theme.typography.fontSize.xl, fontWeight: theme.typography.fontWeight.semibold, padding: `${theme.spacing.lg} ${theme.spacing.xl}`, minHeight: '64px' }}>
                   Crear Pallet
                 </Button>
               </Link>

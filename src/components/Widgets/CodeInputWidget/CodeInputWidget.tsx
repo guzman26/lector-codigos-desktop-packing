@@ -264,24 +264,30 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
   
   const inputStyles: React.CSSProperties = {
     width: '100%',
-    padding: theme.spacing.md,
+    padding: `${theme.spacing.xl} ${theme.spacing.lg}`,
     backgroundColor: theme.colors.background.tertiary,
-    border: `1px solid ${theme.colors.border.light}`,
-    borderRadius: theme.borderRadius.md,
+    border: `2px solid ${theme.colors.border.light}`,
+    borderRadius: theme.borderRadius.lg,
     fontFamily: theme.typography.fontFamily.mono,
-    fontSize: theme.typography.fontSize.base,
+    fontSize: theme.typography.fontSize['2xl'],
+    fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+    minHeight: '72px',
   };
   
   const buttonStyles: React.CSSProperties = {
-    marginLeft: theme.spacing.sm,
+    marginLeft: theme.spacing.md,
+    minHeight: '72px',
+    padding: `0 ${theme.spacing.xl}`,
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: theme.typography.fontWeight.semibold,
   };
   
   const inputContainerStyles: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
     width: '100%',
   };
   
@@ -289,21 +295,21 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
     backgroundColor: theme.colors.background.tertiary,
-    padding: `${theme.spacing.lg} ${theme.spacing.md}`,
-    borderRadius: theme.borderRadius.lg,
-    border: `2px solid ${captureEnabled ? theme.colors.accent.blue : theme.colors.border.light}`,
-    boxShadow: captureEnabled ? `0 0 0 2px ${theme.colors.accent.blue}20` : 'none',
+    padding: `${theme.spacing.xl} ${theme.spacing.lg}`,
+    borderRadius: theme.borderRadius.xl,
+    border: `3px solid ${captureEnabled ? theme.colors.accent.blue : theme.colors.border.light}`,
+    boxShadow: captureEnabled ? `0 0 0 3px ${theme.colors.accent.blue}20` : 'none',
     transition: 'all 0.2s ease',
   };
   
   const toggleLabelStyles: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: theme.typography.fontWeight.semibold,
+    gap: theme.spacing.md,
+    fontSize: theme.typography.fontSize['2xl'],
+    fontWeight: theme.typography.fontWeight.bold,
     color: captureEnabled ? theme.colors.accent.blue : theme.colors.text.primary,
     transition: 'color 0.2s ease',
   };
@@ -338,7 +344,7 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Escanee código de 16 dígitos (envío automático)"
+          placeholder="Escanee código de 16 dígitos"
           style={{
             ...inputStyles,
             borderColor: hasError ? '#FF3B30' : theme.colors.border.light
@@ -361,10 +367,10 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       {/* Status indicator - capture is always active for barcode scanning */}
       <div style={toggleContainerStyles}>
         <span style={toggleLabelStyles}>
-          <ScanLine size={24} color={captureEnabled ? theme.colors.accent.blue : theme.colors.text.primary} />
+          <ScanLine size={36} color={captureEnabled ? theme.colors.accent.blue : theme.colors.text.primary} />
           Modo activo
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: theme.spacing.xs }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: theme.spacing.sm }}>
           <ToggleSwitch
             checked={captureEnabled}
             onChange={() => setCaptureEnabled(prev => !prev)}
@@ -372,11 +378,11 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
             switchSize="large"
           />
           <span style={{
-            fontSize: theme.typography.fontSize.sm,
-            fontWeight: theme.typography.fontWeight.medium,
+            fontSize: theme.typography.fontSize.lg,
+            fontWeight: theme.typography.fontWeight.bold,
             color: captureEnabled ? theme.colors.accent.blue : theme.colors.text.secondary,
             textTransform: 'uppercase',
-            letterSpacing: '0.5px'
+            letterSpacing: '1px'
           }}>
             {captureEnabled ? 'ACTIVADA' : 'DESACTIVADA'}
           </span>
@@ -387,21 +393,23 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
       {latestCode && (
         <div>
           <div style={{ 
-            fontSize: theme.typography.fontSize.xl,
+            fontSize: theme.typography.fontSize['2xl'],
             fontWeight: theme.typography.fontWeight.bold,
-            marginBottom: theme.spacing.md,
-            padding: theme.spacing.md,
+            marginBottom: theme.spacing.lg,
+            padding: theme.spacing.lg,
             backgroundColor: theme.colors.background.tertiary,
-            borderRadius: theme.borderRadius.md,
-            border: `1px solid ${theme.colors.border.light}`,
+            borderRadius: theme.borderRadius.lg,
+            border: `2px solid ${theme.colors.border.light}`,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: theme.spacing.lg,
+            gap: theme.spacing.xl,
           }}>
             <span style={{ 
               fontFamily: theme.typography.fontFamily.mono,
               color: theme.colors.accent.green,
+              fontSize: theme.typography.fontSize['3xl'],
+              fontWeight: theme.typography.fontWeight.bold,
             }}>
               {latestCode}
             </span>
@@ -415,16 +423,16 @@ const CodeInputWidget: React.FC<CodeInputWidgetProps> = ({ data, onCodeSubmit, o
                     gap: theme.spacing.xs,
                     textAlign: 'right',
                     fontFamily: theme.typography.fontFamily.primary,
-                    fontSize: theme.typography.fontSize.sm,
+                    fontSize: theme.typography.fontSize.lg,
                   }}>
-                    <div style={{ color: theme.colors.text.primary }}>
-                      {parsedInfo.calibreText} <span style={{ color: theme.colors.text.secondary }}>(calibre)</span>
+                    <div style={{ color: theme.colors.text.primary, fontWeight: theme.typography.fontWeight.semibold }}>
+                      {parsedInfo.calibreText} <span style={{ color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.base }}>(calibre)</span>
                     </div>
-                    <div style={{ color: theme.colors.text.primary }}>
-                      {parsedInfo.operario} <span style={{ color: theme.colors.text.secondary }}>(operario)</span>
+                    <div style={{ color: theme.colors.text.primary, fontWeight: theme.typography.fontWeight.semibold }}>
+                      {parsedInfo.operario} <span style={{ color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.base }}>(operario)</span>
                     </div>
-                    <div style={{ color: theme.colors.text.primary }}>
-                      {parsedInfo.numeroCaja} <span style={{ color: theme.colors.text.secondary }}>(n° de caja)</span>
+                    <div style={{ color: theme.colors.text.primary, fontWeight: theme.typography.fontWeight.semibold }}>
+                      {parsedInfo.numeroCaja} <span style={{ color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.base }}>(n° de caja)</span>
                     </div>
                   </div>
                 );

@@ -248,7 +248,7 @@ const UnassignedBoxesWidget: React.FC = () => {
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px',
+          gap: theme.spacing.md,
         }}>
           <div style={{
             display: 'flex',
@@ -258,16 +258,16 @@ const UnassignedBoxesWidget: React.FC = () => {
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '4px 10px',
+              gap: '8px',
+              padding: `${theme.spacing.sm} ${theme.spacing.md}`,
               backgroundColor: data.length > 10 ? '#FEF3C7' : '#DBEAFE',
               color: data.length > 10 ? '#92400E' : '#1E40AF',
-              borderRadius: '16px',
-              fontSize: '11px',
+              borderRadius: '20px',
+              fontSize: theme.typography.fontSize.lg,
               fontWeight: '700',
-              border: `1px solid ${data.length > 10 ? '#FCD34D' : '#93C5FD'}`,
+              border: `2px solid ${data.length > 10 ? '#FCD34D' : '#93C5FD'}`,
             }}>
-              {data.length > 10 && <AlertTriangle size={10} />}
+              {data.length > 10 && <AlertTriangle size={20} />}
               {data.length} {data.length === 1 ? 'caja' : 'cajas'}
             </div>
             
@@ -276,8 +276,10 @@ const UnassignedBoxesWidget: React.FC = () => {
               variant="primary"
               style={{ 
                 opacity: data.length === 0 ? 0.5 : 1,
-                padding: '6px 12px',
-                fontSize: '11px',
+                padding: `${theme.spacing.md} ${theme.spacing.lg}`,
+                fontSize: theme.typography.fontSize.lg,
+                fontWeight: theme.typography.fontWeight.semibold,
+                minHeight: '48px',
               }}
             >
               Ver todas
@@ -287,36 +289,36 @@ const UnassignedBoxesWidget: React.FC = () => {
           {loading && (
             <div style={{
               textAlign: 'center',
-              padding: '20px',
+              padding: theme.spacing['2xl'],
               color: '#6B7280',
-              fontSize: '12px',
+              fontSize: theme.typography.fontSize.xl,
             }}>
-              <p style={{ margin: 0 }}>Cargando cajas...</p>
+              <p style={{ margin: 0, fontWeight: theme.typography.fontWeight.medium }}>Cargando cajas...</p>
             </div>
           )}
 
           {error && (
             <div style={{
               textAlign: 'center',
-              padding: '20px',
+              padding: theme.spacing.xl,
               color: '#DC2626',
               backgroundColor: 'rgba(220, 38, 38, 0.1)',
-              borderRadius: '6px',
-              border: '1px solid rgba(220, 38, 38, 0.2)',
+              borderRadius: theme.borderRadius.lg,
+              border: '2px solid rgba(220, 38, 38, 0.2)',
             }}>
-              <AlertTriangle size={20} style={{ marginBottom: '6px' }} />
-              <p style={{ margin: 0, fontSize: '12px' }}>Error: {error.message}</p>
+              <AlertTriangle size={48} style={{ marginBottom: theme.spacing.md }} />
+              <p style={{ margin: 0, fontSize: theme.typography.fontSize.xl, fontWeight: theme.typography.fontWeight.semibold }}>Error: {error.message}</p>
             </div>
           )}
 
           {!loading && !error && data.length === 0 && (
             <div style={{
               textAlign: 'center',
-              padding: '24px 20px',
+              padding: theme.spacing['2xl'],
               color: '#6B7280',
             }}>
-              <Package size={24} style={{ opacity: 0.5, marginBottom: '8px' }} />
-              <p style={{ fontSize: '12px', margin: 0, fontWeight: '500' }}>No hay cajas sin asignar</p>
+              <Package size={64} style={{ opacity: 0.5, marginBottom: theme.spacing.md }} />
+              <p style={{ fontSize: theme.typography.fontSize.xl, margin: 0, fontWeight: theme.typography.fontWeight.medium }}>No hay cajas sin asignar</p>
             </div>
           )}
 

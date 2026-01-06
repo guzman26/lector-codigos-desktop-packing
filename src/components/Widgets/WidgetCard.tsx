@@ -33,7 +33,7 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
   };
 
   const titleWrapperStyles: React.CSSProperties = {
@@ -49,25 +49,27 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
 
   const titleStyles: React.CSSProperties = {
     margin: 0,
-    fontSize: theme.typography.fontSize.xl,
-    fontWeight: theme.typography.fontWeight.semibold,
+    fontSize: theme.typography.fontSize['3xl'],
+    fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text.primary,
     lineHeight: theme.typography.lineHeight.tight,
   };
 
   const subtitleStyles: React.CSSProperties = {
     margin: 0,
-    marginTop: theme.spacing.xs,
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: theme.typography.fontWeight.regular,
+    marginTop: theme.spacing.sm,
+    fontSize: theme.typography.fontSize.xl,
+    fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text.secondary,
     lineHeight: theme.typography.lineHeight.normal,
   };
 
   const iconStyles: React.CSSProperties = {
     color: theme.colors.text.secondary,
-    marginTop: '2px', // Align with text baseline
+    marginTop: '4px', // Align with text baseline
     flexShrink: 0,
+    width: '32px',
+    height: '32px',
   };
 
   return (
